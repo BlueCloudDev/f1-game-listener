@@ -6,6 +6,9 @@ import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.security.KeyFactory;
@@ -24,6 +27,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.FileNotFoundException;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 public class OCIStreaming {
@@ -68,6 +72,7 @@ public class OCIStreaming {
 
       URI url = new URI("https://" + host + restAPI);
       StringEntity entity = new StringEntity(body);
+      entity.setContentType("application/json");
       HttpUriRequest request = RequestBuilder.post()
         .setUri(url)
         .setHeader("date", dateRFC1123Now)
@@ -86,6 +91,8 @@ public class OCIStreaming {
 
     };
   }
+
+ 
 
   public static String digestBody(String body) {
     try {
