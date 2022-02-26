@@ -244,7 +244,7 @@ public class F12020PacketFactory {
     return p;
   }
 
-  public F12020ParticipantData CreateParticipantData(ByteBuffer bb) {
+  public F12020ParticipantData CreateParticipantData(ByteBuffer bb) throws UnsupportedEncodingException {
     F12020ParticipantData p = new F12020ParticipantData();
     p.AiControlled = converter.Uint8(bb.get());
     p.DriverId = converter.Uint8(bb.get());
@@ -256,7 +256,7 @@ public class F12020PacketFactory {
     return p;
   }
 
-  public F12020PacketParticipantData CreatePacketParticipantData(ByteBuffer bb) {
+  public F12020PacketParticipantData CreatePacketParticipantData(ByteBuffer bb) throws UnsupportedEncodingException  {
     F12020PacketParticipantData p = new F12020PacketParticipantData();
     p.NumActiveCars = converter.Uint8(bb.get());
     for (int i = 0; i < p.ParticipantData.length; i++) {
@@ -401,7 +401,7 @@ public class F12020PacketFactory {
     return p;
   }
 
-  public F12020LobbyInfoData CreateLobbyInfoData(ByteBuffer bb) {
+  public F12020LobbyInfoData CreateLobbyInfoData(ByteBuffer bb) throws UnsupportedEncodingException {
     F12020LobbyInfoData p = new F12020LobbyInfoData();
     p.AiControlled = converter.Uint8(bb.get());
     p.TeamId = converter.Uint8(bb.get());
@@ -411,7 +411,7 @@ public class F12020PacketFactory {
     return p;
   }
 
-  public F12020PacketLobbyInfoData CreatePacketLobbyInfoData(ByteBuffer bb) {
+  public F12020PacketLobbyInfoData CreatePacketLobbyInfoData(ByteBuffer bb) throws UnsupportedEncodingException{
     F12020PacketLobbyInfoData p = new F12020PacketLobbyInfoData();
     p.NumPlayers = converter.Uint8(bb.get());
     for(int i = 0; i < p.LobbyPlayers.length; i++) {
@@ -420,15 +420,11 @@ public class F12020PacketFactory {
     return p;
   }
 
-  private String getName(ByteBuffer bb) {
+  private String getName(ByteBuffer bb) throws UnsupportedEncodingException {
     byte[] name = new byte[48];
     bb.get(name);
     String nameString = "";
-    try {
-      nameString = new String(name, "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      ex.printStackTrace();
-    }
+    nameString = new String(name, "UTF-8");
     return nameString;
   }
 

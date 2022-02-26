@@ -1,7 +1,5 @@
 package Converter;
 
-import java.math.BigInteger;
-
 public class Converter {
   public short Uint8(byte b){
     return b;
