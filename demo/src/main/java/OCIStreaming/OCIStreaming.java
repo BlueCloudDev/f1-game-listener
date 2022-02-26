@@ -88,8 +88,8 @@ public class OCIStreaming {
   
 
   public void GetMessage() throws IOException, ClientProtocolException, SQLException {
-    //OracleDataSourceProvider odsp = new OracleDataSourceProvider();
-    //OracleDataSource ods = odsp.GetOracleDataSource();
+    OracleDataSourceProvider odsp = new OracleDataSourceProvider();
+    OracleDataSource ods = odsp.GetOracleDataSource();
     Gson gson = new Gson();
     HttpUriRequest req = buildGetRequest();
     HttpResponse resp = httpClient.execute(req);
@@ -103,17 +103,14 @@ public class OCIStreaming {
         String[] keyItems = key.split(",");
         int packetId =  Integer.parseInt(keyItems[0]);
         String value = Base64Decode(msg.getString("value"));
-        F12020PacketSessionData p1 = gson.fromJson(value, F12020PacketSessionData.class);
-        SessionDataRepository repo = new SessionDataRepository();
-        repo.InsertSessionData(Long.parseLong(keyItems[1]), p1);
         switch (packetId) {
           case 0:
             F12020PacketMotionData p = gson.fromJson(value, F12020PacketMotionData.class);
             break;
           case 1:
-            //F12020PacketSessionData p1 = gson.fromJson(value, F12020PacketSessionData.class);
-            //SessionDataRepository repo = new SessionDataRepository();
-            //repo.InsertSessionData(Long.parseLong(keyItems[1]), p1);
+            F12020PacketSessionData p1 = gson.fromJson(value, F12020PacketSessionData.class);
+            SessionDataRepository repo = new SessionDataRepository();
+            repo.InsertSessionData(Long.parseLong(keyItems[1]), p1, ods);
             break;
           case 2:
             F12020PacketLapData p2 = gson.fromJson(value, F12020PacketLapData.class);

@@ -16,6 +16,5 @@ INSERT INTO t_session_data (
   m_spectator_car_index,
   m_sli_pro_native_support,
   m_car_safety_status,
-  m_network_game,
+  m_network_game
 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-RETURNING id INTO ?;

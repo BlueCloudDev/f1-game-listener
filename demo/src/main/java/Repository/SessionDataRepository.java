@@ -1,10 +1,12 @@
 package Repository;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import Converter.GameDataConverter;
@@ -23,14 +25,11 @@ public class SessionDataRepository {
     //dataSource = ods;
   }
 
-  public void InsertSessionData(long sessionUID, F12020PacketSessionData sessionData) {
-    String DB_URL="jdbc:oracle:thin:@db202201261034_high?TNS_ADMIN=/home/opc/Wallet_DB202201261034";
-    String DB_USER="admin";
-    String DB_PASSWORD="OracleDataTx1!";
-    try {
-      Connection con = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+  public void InsertSessionData(long sessionUID, F12020PacketSessionData sessionData, OracleDataSource dataSource) {
+    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
       con.setAutoCommit(true);
-      String query = new String(Files.readAllBytes(Paths.get("src/main/java/Repository/Statements/InsertSessionData.sql")));
+      File file = new File("/home/opc/f1-game-listener/demo/src/InsertSessionData.sql");
+      String query = new String(Files.readAllBytes(file.toPath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, sessionUID);
         stmt.setString(2, gdc.Weather(sessionData.Weather));
@@ -50,10 +49,27 @@ public class SessionDataRepository {
         stmt.setInt(16, sessionData.SliProNativeSupport);
         stmt.setString(17, gdc.SafetyCarStatus(sessionData.SafetyCarStatus));
         stmt.setString(18, gdc.NetworkGame(sessionData.NetworkGame));
-        int id = stmt.executeUpdate();
+        int id = 0;
+        if (stmt.executeUpdate() > 0) {
 
-        if (sessionData.MarshalZones.length > 0) {
-          String mzq = new String(Files.readAllBytes(Paths.get("src/main/java/Repository/Statements/InsertMarshalZone.sql")));
+          // getGeneratedKeys() returns result set of keys that were auto
+          // generated
+          // in our case student_id column
+          ResultSet generatedKeys = stmt.getGeneratedKeys();
+      
+          // if resultset has data, get the primary key value
+          // of last inserted record
+          if (null != generatedKeys && generatedKeys.next()) {
+      
+              // voila! we got student id which was generated from sequence
+              id = generatedKeys.getInt(1);
+          }
+      
+        }
+
+        if (id > 0 && sessionData.MarshalZones.length > 0) {
+          File f2 = new File ("/home/opc/f1-game-listener/demo/src/InsertMarshalZone.sql");
+          String mzq = new String(Files.readAllBytes(f2.toPath()));
           for (F12020MarshalZone mz : sessionData.MarshalZones) {
             try (PreparedStatement mzstmt = con.prepareStatement(mzq)) {
               mzstmt.setInt(1, id);
@@ -64,8 +80,9 @@ public class SessionDataRepository {
           }
         }
 
-        if (sessionData.WeatherForecastSamples.length > 0) {
-          String wfq = new String(Files.readAllBytes(Paths.get("src/main/java/Repository/Statements/InsertWeatherForecast.sql")));
+        if (id > 0 && sessionData.WeatherForecastSamples.length > 0) {
+          File f3 = new File ("/home/opc/f1-game-listener/demo/src/InsertMarshalZone.sql");
+          String wfq = new String(Files.readAllBytes(f3.toPath()));
           for (F12020WeatherForecastSample wf : sessionData.WeatherForecastSamples) {
             try (PreparedStatement wfstmt = con.prepareStatement(wfq)) {
               wfstmt.setInt(1, id);
