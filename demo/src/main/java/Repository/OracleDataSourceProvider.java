@@ -8,7 +8,7 @@ import oracle.jdbc.pool.OracleDataSource;
 
 public class OracleDataSourceProvider {
   public OracleDataSource GetOracleDataSource() throws SQLException {
-    String DB_URL="jdbc:oracle:thin:@db202201261034_low?TNS_ADMIN=/home/opc/Wallet_DB202201261034";
+    String DB_URL="jdbc:oracle:thin:@db202201261034_high?TNS_ADMIN=/home/opc/Wallet_DB202201261034";
     String DB_USER="admin";
     String DB_PASSWORD="OracleDataTx1!";
 

@@ -18,7 +18,7 @@ public class App {
   public static void main(String[] args) {
     Timer timer = new Timer();
     TimerTask getMsgTask = GetMessagesTask();
-    timer.scheduleAtFixedRate(getMsgTask, 1000, 1000);
+    timer.scheduleAtFixedRate(getMsgTask, 5000, 5000);
     
     try {
 

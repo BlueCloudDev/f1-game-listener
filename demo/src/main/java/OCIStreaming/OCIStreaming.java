@@ -17,7 +17,9 @@ import org.json.JSONObject;
 import F12020Packet.F12020PacketMotionData;
 import F12020Packet.F12020PacketParticipantData;
 import F12020Packet.F12020PacketSessionData;
+import Repository.MotionDataRepository;
 import Repository.OracleDataSourceProvider;
+import Repository.PacketHeaderRepository;
 import Repository.SessionDataRepository;
 import oracle.jdbc.pool.OracleDataSource;
 import F12020Packet.F12020PacketCarSetupData;
@@ -25,6 +27,7 @@ import F12020Packet.F12020PacketCarStatusData;
 import F12020Packet.F12020PacketCarTelemetryData;
 import F12020Packet.F12020PacketEventData;
 import F12020Packet.F12020PacketFinalClassificationData;
+import F12020Packet.F12020PacketHeader;
 import F12020Packet.F12020PacketLapData;
 
 import java.time.ZonedDateTime;
@@ -59,6 +62,7 @@ public class OCIStreaming {
   private String streamID = "ocid1.stream.oc1.us-sanjose-1.amaaaaaapwneysaavpcrulmeaiaycj6ktnuqsdyl3qacdjiq3bf4hkzsipnq";
   private String configFilePath = "/home/opc/.oci/config";
   private String cursorID = "";
+  private long offset = 0;
 
   public OCIStreaming() throws OCIStreamingException, Exception {
     
@@ -71,7 +75,7 @@ public class OCIStreaming {
     .setMaxConnTotal(100)
     .setMaxConnPerRoute(20)
     .build();
-    cursorID = getCursorID();
+    cursorID = getCursorID("TRIM_HORIZON", offset);
   }
 
   public void SendMessage(String body) throws IOException, ClientProtocolException, Exception {
@@ -87,7 +91,7 @@ public class OCIStreaming {
 
   
 
-  public void GetMessage() throws IOException, ClientProtocolException, SQLException {
+  public void GetMessage() throws IOException, ClientProtocolException, SQLException, Exception {
     OracleDataSourceProvider odsp = new OracleDataSourceProvider();
     OracleDataSource ods = odsp.GetOracleDataSource();
     Gson gson = new Gson();
@@ -95,46 +99,77 @@ public class OCIStreaming {
     HttpResponse resp = httpClient.execute(req);
     HttpEntity entity = resp.getEntity();
     String result = EntityUtils.toString(entity);
+    if (offset > 0) {
+      cursorID = getCursorID("AFTER_OFFSET", offset);
+    }
     if (!result.equals("[]")) {
+      if (!result.startsWith("[")){
+        System.out.println(result);
+        return;
+      }
       JSONArray respBody = new JSONArray(result);
       for(int i=0; i<respBody.length(); i++) {
         JSONObject msg = respBody.getJSONObject(i);
-        String key = Base64Decode(msg.getString("key"));
-        String[] keyItems = key.split(",");
-        int packetId =  Integer.parseInt(keyItems[0]);
+        long msgOffset = msg.getLong("offset");
+        if (offset < msgOffset) {
+          offset = msgOffset;
+        }
+        //String key = Base64Decode(msg.getString("key"));
+        //String[] keyItems = key.split(",");
+        //int packetId =  Integer.parseInt(keyItems[0]);
         String value = Base64Decode(msg.getString("value"));
-        switch (packetId) {
+        if (!value.startsWith("[")) {
+          continue;
+        }
+        JSONArray ja = new JSONArray(value);
+        if (ja.length() == 0 || !ja.get(0).toString().startsWith("{")) {
+          continue;
+        }
+        F12020PacketHeader header = gson.fromJson(ja.get(0).toString(), F12020PacketHeader.class);
+        PacketHeaderRepository prepo = new PacketHeaderRepository();
+        long id = prepo.InsertPacketHeader(header, ods);
+        if (id == 0) {
+          continue;
+        }
+        switch (header.PacketId) {
           case 0:
-            F12020PacketMotionData p = gson.fromJson(value, F12020PacketMotionData.class);
+            F12020PacketMotionData p = gson.fromJson(ja.get(1).toString(), F12020PacketMotionData.class);
+            MotionDataRepository mrepo = new MotionDataRepository();
+            for(int j = 0; j < p.CarMotionData.length; j++) {
+              long mdid = mrepo.InsertMotionData(id, p.CarMotionData[j], ods);
+              if (j == (int)header.PlayerCarIndex){
+                mrepo.InsertMotionDataPlayer(mdid, p, ods);
+              }
+            }
             break;
           case 1:
-            F12020PacketSessionData p1 = gson.fromJson(value, F12020PacketSessionData.class);
+            F12020PacketSessionData p1 = gson.fromJson(ja.get(1).toString(), F12020PacketSessionData.class);
             SessionDataRepository repo = new SessionDataRepository();
-            repo.InsertSessionData(Long.parseLong(keyItems[1]), p1, ods);
+            repo.InsertSessionData(id, p1, ods);
             break;
           case 2:
-            F12020PacketLapData p2 = gson.fromJson(value, F12020PacketLapData.class);
+            F12020PacketLapData p2 = gson.fromJson(ja.get(1).toString(), F12020PacketLapData.class);
             break;
           case 3:
-            F12020PacketEventData p3 = gson.fromJson(value, F12020PacketEventData.class);
+            F12020PacketEventData p3 = gson.fromJson(ja.get(1).toString(), F12020PacketEventData.class);
             break;
           case 4:
-            F12020PacketParticipantData p4 = gson.fromJson(value, F12020PacketParticipantData.class);
+            F12020PacketParticipantData p4 = gson.fromJson(ja.get(1).toString(), F12020PacketParticipantData.class);
             break;
           case 5:
-            F12020PacketCarSetupData p5 = gson.fromJson(value, F12020PacketCarSetupData.class);
+            F12020PacketCarSetupData p5 = gson.fromJson(ja.get(1).toString(), F12020PacketCarSetupData.class);
             break;
           case 6:
-            F12020PacketCarTelemetryData p6 = gson.fromJson(value, F12020PacketCarTelemetryData.class);
+            F12020PacketCarTelemetryData p6 = gson.fromJson(ja.get(1).toString(), F12020PacketCarTelemetryData.class);
             break;
           case 7:
-            F12020PacketCarStatusData p7 = gson.fromJson(value, F12020PacketCarStatusData.class);
+            F12020PacketCarStatusData p7 = gson.fromJson(ja.get(1).toString(), F12020PacketCarStatusData.class);
             break;  
           case 8:
-            F12020PacketFinalClassificationData p8 = gson.fromJson(value, F12020PacketFinalClassificationData.class);
+            F12020PacketFinalClassificationData p8 = gson.fromJson(ja.get(1).toString(), F12020PacketFinalClassificationData.class);
             break;
           case 9:
-            F12020PacketFinalClassificationData p9 = gson.fromJson(value, F12020PacketFinalClassificationData.class);
+            F12020PacketFinalClassificationData p9 = gson.fromJson(ja.get(1).toString(), F12020PacketFinalClassificationData.class);
             break;
         }
       }
@@ -208,9 +243,9 @@ public class OCIStreaming {
     return request;
   }
 
-  public String getCursorID() throws URISyntaxException, IOException, ParseException, Exception {
+  public String getCursorID(String type, long offset) throws URISyntaxException, IOException, ParseException, Exception {
     String cursorID = "";
-    String cursBody = getCursorRequestBody();
+    String cursBody = getCursorRequestBody(type, offset);
     HttpUriRequest cursReq = buildPostRequest(cursBody, "cursors");
     HttpResponse cursResp = httpClient.execute(cursReq);
     HttpEntity cursEntity = cursResp.getEntity();
@@ -220,10 +255,11 @@ public class OCIStreaming {
     return cursorID;
   }
 
-  public String getCursorRequestBody() {
+  public String getCursorRequestBody(String type, long offset) {
     JSONObject body = new JSONObject();
     body.put("partition", "0");
-    body.put("type", "LATEST");
+    body.put("type", type);
+    body.put("offset", offset);
     return body.toString();
   }
 

@@ -96,70 +96,72 @@ public class UDPListener {
     
     F12020PacketFactory factory = new F12020PacketFactory();
     F12020PacketHeader header = factory.CreatePacketHeader(bb);
-  
+    String headerJson = gson.toJson(header);
     String body = "";
     String payload = "";
     OCIStreamingMessage osm = new OCIStreamingMessage();
+    String key = "F12020";
     try {
       switch (header.PacketId) {
         case 0:
           F12020PacketMotionData motion = factory.CreatePacketMotionData(bb);
           body = gson.toJson(motion);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          //payload = osm.Build("header.PacketId + "," + header.SessionUID.toString()", headerJson, body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 1:
           F12020PacketSessionData session = factory.CreatePacksetSessionData(bb);
           body = gson.toJson(session);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 2:
           F12020PacketLapData lap = factory.CreatePacketLapData(bb);
           body = gson.toJson(lap);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 3:
           F12020PacketEventData event = factory.CreatePacketEventData(bb);
           body = gson.toJson(event);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 4:
           F12020PacketParticipantData participants = factory.CreatePacketParticipantData(bb);
           body = gson.toJson(participants);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 5:
           F12020PacketCarSetupData carsetup = factory.CreatePacketCarSetupData(bb);
           body = gson.toJson(carsetup);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 6:
           F12020PacketCarTelemetryData cartelemetry = factory.CreatePacketCarTelemetryData(bb);
           body = gson.toJson(cartelemetry);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 7:
           F12020PacketCarStatusData carstatus = factory.CreatePacketCarStatusData(bb);
           body = gson.toJson(carstatus);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 8:
           F12020PacketFinalClassificationData finalClassification = factory.CreatePacketFinalClassificationData(bb);
           body = gson.toJson(finalClassification);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         case 9:
           F12020PacketLobbyInfoData lobby = factory.CreatePacketLobbyInfoData(bb);
           body = gson.toJson(lobby);
-          payload = osm.Build(header.PacketId + "," + header.SessionUID.toString(), body);
+          payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
         default:

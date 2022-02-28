@@ -1,5 +1,5 @@
 INSERT INTO t_session_data (
-  m_session_UID,
+  m_packet_id,
   m_weather,
   m_track_temperature,
   m_air_temperature,
