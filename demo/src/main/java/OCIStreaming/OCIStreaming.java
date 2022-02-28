@@ -39,21 +39,23 @@ import java.security.MessageDigest;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Base64;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.nio.charset.Charset;
 
 public class OCIStreaming {
@@ -62,7 +64,7 @@ public class OCIStreaming {
   private String streamID = "ocid1.stream.oc1.us-sanjose-1.amaaaaaapwneysaavpcrulmeaiaycj6ktnuqsdyl3qacdjiq3bf4hkzsipnq";
   private String configFilePath = "/home/opc/.oci/config";
   private String cursorID = "";
-  private long offset = 0;
+  private static long offset = 0;
 
   public OCIStreaming() throws OCIStreamingException, Exception {
     
@@ -94,7 +96,7 @@ public class OCIStreaming {
   public void GetMessage() throws IOException, ClientProtocolException, SQLException, Exception {
     OracleDataSourceProvider odsp = new OracleDataSourceProvider();
     OracleDataSource ods = odsp.GetOracleDataSource();
-    Gson gson = new Gson();
+    
     HttpUriRequest req = buildGetRequest();
     HttpResponse resp = httpClient.execute(req);
     HttpEntity entity = resp.getEntity();
@@ -108,8 +110,22 @@ public class OCIStreaming {
         return;
       }
       JSONArray respBody = new JSONArray(result);
-      for(int i=0; i<respBody.length(); i++) {
+      List<Integer> range = new ArrayList<Integer>();
+      for (int i = 0; i < respBody.length(); i++) {
+        range.add(i);
+      }
+      range.parallelStream().forEach(number ->
+        processEntry((JSONObject)respBody.get(number), ods)
+      );
+      /*for(int i=0; i<respBody.length(); i++) {
         JSONObject msg = respBody.getJSONObject(i);
+        
+      }*/
+    }
+  }
+
+  public void processEntry(JSONObject msg, OracleDataSource ods) {
+        Gson gson = new Gson();
         long msgOffset = msg.getLong("offset");
         if (offset < msgOffset) {
           offset = msgOffset;
@@ -119,17 +135,17 @@ public class OCIStreaming {
         //int packetId =  Integer.parseInt(keyItems[0]);
         String value = Base64Decode(msg.getString("value"));
         if (!value.startsWith("[")) {
-          continue;
+          return;
         }
         JSONArray ja = new JSONArray(value);
         if (ja.length() == 0 || !ja.get(0).toString().startsWith("{")) {
-          continue;
+          return;
         }
         F12020PacketHeader header = gson.fromJson(ja.get(0).toString(), F12020PacketHeader.class);
         PacketHeaderRepository prepo = new PacketHeaderRepository();
         long id = prepo.InsertPacketHeader(header, ods);
         if (id == 0) {
-          continue;
+          return;
         }
         switch (header.PacketId) {
           case 0:
@@ -172,8 +188,6 @@ public class OCIStreaming {
             F12020PacketFinalClassificationData p9 = gson.fromJson(ja.get(1).toString(), F12020PacketFinalClassificationData.class);
             break;
         }
-      }
-    }
   }
 
   public static String Base64Decode(String base64Encoded) {

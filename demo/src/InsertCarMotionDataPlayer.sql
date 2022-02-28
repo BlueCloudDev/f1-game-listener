@@ -3,7 +3,7 @@ INSERT INTO t_car_motion_data_player (
   m_suspension_position_RL,
   m_suspension_position_RR,
   m_suspension_position_FL,
-  m_suspension_position_RR,
+  m_suspension_position_FR,
   m_suspension_velocity_RL,
   m_suspension_velocity_RR,
   m_suspension_velocity_FL,

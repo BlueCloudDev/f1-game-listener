@@ -34,6 +34,18 @@ public class GameDataConverter {
     }
   }
 
+  public String ZoneFlag(short zoneFlag) {
+    switch (zoneFlag) {
+      case -1: return "Invalid/Unknown";
+      case 0: return "None";
+      case 1: return "Green";
+      case 2: return "Blue";
+      case 3: return "Yellow";
+      case 4: return "Red";
+      default: return "Default";
+    }
+  }
+
   public String Formula(short formula) {
     switch (formula) {
       case 0: return "F1 Modern";

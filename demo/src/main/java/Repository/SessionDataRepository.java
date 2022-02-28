@@ -55,14 +55,14 @@ public class SessionDataRepository {
             try (PreparedStatement mzstmt = con.prepareStatement(mzq)) {
               mzstmt.setLong(1, id);
               mzstmt.setFloat(2, mz.ZoneStart);
-              mzstmt.setInt(3, mz.ZoneFlag);
+              mzstmt.setString(3, gdc.ZoneFlag(mz.ZoneFlag));
               mzstmt.execute();
             }
           }
         }
 
         if (id > 0 && sessionData.WeatherForecastSamples.length > 0) {
-          File f3 = new File ("/home/opc/f1-game-listener/demo/src/InsertMarshalZone.sql");
+          File f3 = new File ("/home/opc/f1-game-listener/demo/src/InsertWeatherForecast.sql");
           String wfq = new String(Files.readAllBytes(f3.toPath()));
           for (F12020WeatherForecastSample wf : sessionData.WeatherForecastSamples) {
             try (PreparedStatement wfstmt = con.prepareStatement(wfq)) {
