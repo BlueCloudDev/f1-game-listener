@@ -17,11 +17,22 @@ import org.json.JSONObject;
 import F12020Packet.F12020PacketMotionData;
 import F12020Packet.F12020PacketParticipantData;
 import F12020Packet.F12020PacketSessionData;
+import F12020Packet.F12020ParticipantData;
+import Repository.CarSetupDataRepository;
+import Repository.CarStatusDataRepository;
+import Repository.CarTelemetryRepository;
+import Repository.LapDataRepository;
 import Repository.MotionDataRepository;
 import Repository.OracleDataSourceProvider;
 import Repository.PacketHeaderRepository;
+import Repository.ParticipantDataRepository;
 import Repository.SessionDataRepository;
 import oracle.jdbc.pool.OracleDataSource;
+import F12020Packet.F12020CarSetupData;
+import F12020Packet.F12020CarStatusData;
+import F12020Packet.F12020CarTelemetryData;
+import F12020Packet.F12020LapData;
+import F12020Packet.F12020LobbyInfoData;
 import F12020Packet.F12020PacketCarSetupData;
 import F12020Packet.F12020PacketCarStatusData;
 import F12020Packet.F12020PacketCarTelemetryData;
@@ -165,27 +176,47 @@ public class OCIStreaming {
             break;
           case 2:
             F12020PacketLapData p2 = gson.fromJson(ja.get(1).toString(), F12020PacketLapData.class);
+            LapDataRepository repo2 = new LapDataRepository();
+            for (F12020LapData data : p2.LapData) {
+              repo2.InsertLapData(id, data, ods);
+            }
             break;
           case 3:
             F12020PacketEventData p3 = gson.fromJson(ja.get(1).toString(), F12020PacketEventData.class);
             break;
           case 4:
             F12020PacketParticipantData p4 = gson.fromJson(ja.get(1).toString(), F12020PacketParticipantData.class);
+            ParticipantDataRepository repo3 = new ParticipantDataRepository();
+            for (F12020ParticipantData data : p4.ParticipantData) {
+              repo3.InsertParticipantData(id, data, ods);
+            }
             break;
           case 5:
             F12020PacketCarSetupData p5 = gson.fromJson(ja.get(1).toString(), F12020PacketCarSetupData.class);
+            CarSetupDataRepository repo4 = new CarSetupDataRepository();
+            for (F12020CarSetupData data : p5.CarSetups) {
+              repo4.InsertCarSetupData(id, data, ods);
+            }
             break;
           case 6:
             F12020PacketCarTelemetryData p6 = gson.fromJson(ja.get(1).toString(), F12020PacketCarTelemetryData.class);
+            CarTelemetryRepository repo5 = new CarTelemetryRepository();
+            for (F12020CarTelemetryData data : p6.CarTelemetryData) {
+              repo5.InsertCarTelemetryData(id, data, ods);
+            }
             break;
           case 7:
             F12020PacketCarStatusData p7 = gson.fromJson(ja.get(1).toString(), F12020PacketCarStatusData.class);
+            CarStatusDataRepository repo6 = new CarStatusDataRepository();
+            for (F12020CarStatusData data : p7.CarStatusData) {
+              repo6.InsertCarStatusData(id, data, ods);
+            }
             break;  
           case 8:
             F12020PacketFinalClassificationData p8 = gson.fromJson(ja.get(1).toString(), F12020PacketFinalClassificationData.class);
             break;
           case 9:
-            F12020PacketFinalClassificationData p9 = gson.fromJson(ja.get(1).toString(), F12020PacketFinalClassificationData.class);
+            F12020LobbyInfoData p9 = gson.fromJson(ja.get(1).toString(), F12020LobbyInfoData.class);
             break;
         }
   }
