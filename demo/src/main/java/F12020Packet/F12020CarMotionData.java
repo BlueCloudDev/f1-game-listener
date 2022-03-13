@@ -2,6 +2,10 @@ package F12020Packet;
 
 public class F12020CarMotionData {
   /**
+   * Index of car motion data in array
+   */
+  public int Index;
+  /**
    * World space X position
    */
   public float WorldPositionX;

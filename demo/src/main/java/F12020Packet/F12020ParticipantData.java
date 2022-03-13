@@ -2,6 +2,10 @@ package F12020Packet;
 
 public class F12020ParticipantData {
   /**
+   * Index of participant in array
+   */
+  public int Index;
+  /**
    * Whether the vehicle is AI (1) or Human (0) controlled
    */
   public short AiControlled;

@@ -55,6 +55,7 @@ public class F12020PacketFactory {
     for(int i = 0; i < p.CarMotionData.length; i++){
       F12020CarMotionData c = CreateCarMotionData(bb);
       p.CarMotionData[i] = c;
+      p.CarMotionData[i].Index = i;
     }
     p.SuspensionPosition = getFloatWheelData(bb);
     p.SuspensionVelocity = getFloatWheelData(bb);
@@ -259,8 +260,9 @@ public class F12020PacketFactory {
   public F12020PacketParticipantData CreatePacketParticipantData(ByteBuffer bb) throws UnsupportedEncodingException  {
     F12020PacketParticipantData p = new F12020PacketParticipantData();
     p.NumActiveCars = converter.Uint8(bb.get());
-    for (int i = 0; i < p.ParticipantData.length; i++) {
+    for (int i = 0; i < p.NumActiveCars; i++) {
       p.ParticipantData[i] = CreateParticipantData(bb);
+      p.ParticipantData[i].Index = i;
     }
     return p;
   }
@@ -296,6 +298,7 @@ public class F12020PacketFactory {
     F12020PacketCarSetupData p = new F12020PacketCarSetupData();
     for(int i = 0; i < p.CarSetups.length; i++) {
       p.CarSetups[i] = CreateCarSetupData(bb);
+      p.CarSetups[i].Index = i;
     }
     return p;
   }
@@ -323,11 +326,13 @@ public class F12020PacketFactory {
   public F12020PacketCarTelemetryData CreatePacketCarTelemetryData(ByteBuffer bb) {
     F12020PacketCarTelemetryData p = new F12020PacketCarTelemetryData();
     for(int i = 0; i < p.CarTelemetryData.length; i++) {
-      p.ButtonStatus = converter.Uint32(bb.getInt());
-      p.MFDPanelIndex = converter.Uint8(bb.get());
-      p.MFDPanelIndexSecondaryPlayer = converter.Uint8(bb.get());
-      p.SuggestedGear = bb.getShort();
+      p.CarTelemetryData[i] = CreateCarTelemetryData(bb);
+      p.CarTelemetryData[i].Index = i;
     }
+    p.ButtonStatus = converter.Uint32(bb.getInt());
+    p.MFDPanelIndex = converter.Uint8(bb.get());
+    p.MFDPanelIndexSecondaryPlayer = converter.Uint8(bb.get());
+    p.SuggestedGear = bb.getShort();
     return p;
   }
 
@@ -370,6 +375,7 @@ public class F12020PacketFactory {
     F12020PacketCarStatusData p = new F12020PacketCarStatusData();
     for(int i = 0; i < p.CarStatusData.length; i++) {
       p.CarStatusData[i] = CreateCarStatusData(bb);
+      p.CarStatusData[i].Index = i;
     }
     return p;
   }

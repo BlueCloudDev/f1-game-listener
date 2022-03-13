@@ -2,6 +2,10 @@ package F12020Packet;
 
 public class F12020CarTelemetryData {
   /**
+   * Index of car in array
+   */
+  public int Index;
+  /**
    * Speed of car in kilometres per hour
    */
   public short Speed;

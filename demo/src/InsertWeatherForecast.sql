@@ -4,5 +4,5 @@ INSERT INTO t_session_data (
   m_time_offset,
   m_weather,
   m_track_temperature,
-  m_air_temperature,
+  m_air_temperature
 ) VALUES (?, ?, ?, ?, ?, ?)

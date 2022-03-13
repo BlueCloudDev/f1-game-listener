@@ -4,6 +4,7 @@ import java.io.File;
 import java.nio.file.Files;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import F12020Packet.F12020PacketHeader;
 import oracle.jdbc.OracleConnection;
@@ -35,7 +36,10 @@ public class PacketHeaderRepository {
           }
         }
       }
-    } catch (Exception ex) {
+    } catch (SQLIntegrityConstraintViolationException ex) {
+      return id;
+    } 
+    catch (Exception ex) {
       ex.printStackTrace();
     }
     return id;

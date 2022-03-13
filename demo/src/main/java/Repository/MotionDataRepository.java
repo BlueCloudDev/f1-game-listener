@@ -21,23 +21,24 @@ public class MotionDataRepository {
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
         stmt.setLong(1, packetHeaderID);
-        stmt.setFloat(2, motionData.WorldPositionX);
-        stmt.setFloat(3, motionData.WorldPositionY);
-        stmt.setFloat(4, motionData.WorldPositionZ);
-        stmt.setFloat(5, motionData.WorldVelocityX);
-        stmt.setFloat(6, motionData.WorldVelocityY);
-        stmt.setFloat(7, motionData.WorldVelocityZ);
-        stmt.setFloat(8, motionData.WorldForwardDirX);
-        stmt.setFloat(9, motionData.WorldForwardDirY);
-        stmt.setFloat(10, motionData.WorldForwardDirZ);
-        stmt.setFloat(11, motionData.WorldRightDirX);
-        stmt.setFloat(12, motionData.WorldRightDirY);
-        stmt.setFloat(13, motionData.WorldRightDirZ);
-        stmt.setFloat(14, motionData.GForceLateral);
-        stmt.setFloat(15, motionData.GForceLongitudinal);
-        stmt.setFloat(16, motionData.Yaw);
-        stmt.setFloat(17, motionData.Pitch);
-        stmt.setFloat(18, motionData.Roll);
+        stmt.setInt(2, motionData.Index);
+        stmt.setFloat(3, motionData.WorldPositionX);
+        stmt.setFloat(4, motionData.WorldPositionY);
+        stmt.setFloat(5, motionData.WorldPositionZ);
+        stmt.setFloat(6, motionData.WorldVelocityX);
+        stmt.setFloat(7, motionData.WorldVelocityY);
+        stmt.setFloat(8, motionData.WorldVelocityZ);
+        stmt.setFloat(9, motionData.WorldForwardDirX);
+        stmt.setFloat(10, motionData.WorldForwardDirY);
+        stmt.setFloat(11, motionData.WorldForwardDirZ);
+        stmt.setFloat(12, motionData.WorldRightDirX);
+        stmt.setFloat(13, motionData.WorldRightDirY);
+        stmt.setFloat(14, motionData.WorldRightDirZ);
+        stmt.setFloat(15, motionData.GForceLateral);
+        stmt.setFloat(16, motionData.GForceLongitudinal);
+        stmt.setFloat(17, motionData.Yaw);
+        stmt.setFloat(18, motionData.Pitch);
+        stmt.setFloat(19, motionData.Roll);
         
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();

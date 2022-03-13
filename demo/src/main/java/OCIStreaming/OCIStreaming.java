@@ -50,8 +50,10 @@ import java.security.MessageDigest;
 import java.security.spec.PKCS8EncodedKeySpec;
 import java.sql.SQLException;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Base64;
+import java.util.Date;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Map;
@@ -72,7 +74,8 @@ import java.nio.charset.Charset;
 public class OCIStreaming {
   private CloseableHttpClient  httpClient; 
   private Map<String, String> config = new HashMap<String, String>();
-  private String streamID = "ocid1.stream.oc1.us-sanjose-1.amaaaaaapwneysaavpcrulmeaiaycj6ktnuqsdyl3qacdjiq3bf4hkzsipnq";
+  private String streamID = "ocid1.stream.oc1.uk-london-1.amaaaaaaywfcc6aabs22e3r4cwsqmh63gjej4lhsybgtdnfbogxckwp3cdha";
+  private String host = "cell-1.streaming.uk-london-1.oci.oraclecloud.com";
   private String configFilePath = "/home/opc/.oci/config";
   private String cursorID = "";
   private static long offset = 0;
@@ -88,7 +91,7 @@ public class OCIStreaming {
     .setMaxConnTotal(100)
     .setMaxConnPerRoute(20)
     .build();
-    cursorID = getCursorID("TRIM_HORIZON", offset);
+    cursorID = getCursorID("AT_TIME", offset);
   }
 
   public void SendMessage(String body) throws IOException, ClientProtocolException, Exception {
@@ -202,7 +205,9 @@ public class OCIStreaming {
             F12020PacketCarTelemetryData p6 = gson.fromJson(ja.get(1).toString(), F12020PacketCarTelemetryData.class);
             CarTelemetryRepository repo5 = new CarTelemetryRepository();
             for (F12020CarTelemetryData data : p6.CarTelemetryData) {
-              repo5.InsertCarTelemetryData(id, data, ods);
+              if (data != null) {
+                repo5.InsertCarTelemetryData(id, data, ods);
+              }
             }
             break;
           case 7:
@@ -229,7 +234,6 @@ public class OCIStreaming {
   public HttpUriRequest buildPostRequest(String body, String endpoint) throws URISyntaxException, Exception {
     body = body + "\n";
     String restAPI = "/20180418/streams/"+ streamID + "/" + endpoint;
-    String host = "cell-1.streaming.us-sanjose-1.oci.oraclecloud.com";
     DateTimeFormatter dtf = DateTimeFormatter.RFC_1123_DATE_TIME;
     ZonedDateTime now = ZonedDateTime.now();
     String dateRFC1123Now = dtf.format(now);
@@ -264,7 +268,7 @@ public class OCIStreaming {
     HttpUriRequest request = null;
     try {
       String restAPI = "/20180418/streams/" + streamID + "/messages?cursor="+cursorID;
-      String host = "cell-1.streaming.us-sanjose-1.oci.oraclecloud.com";
+      
       DateTimeFormatter dtf = DateTimeFormatter.RFC_1123_DATE_TIME;
       ZonedDateTime now = ZonedDateTime.now();
       String dateRFC1123Now = dtf.format(now);
@@ -296,7 +300,9 @@ public class OCIStreaming {
     HttpEntity cursEntity = cursResp.getEntity();
     String cursRes = EntityUtils.toString(cursEntity);
     JSONObject cursRespBody = new JSONObject(cursRes);
-    cursorID = cursRespBody.getString("value");    
+    if (cursRespBody.has("value")) {
+      cursorID = cursRespBody.getString("value");    
+    }
     return cursorID;
   }
 
@@ -305,6 +311,13 @@ public class OCIStreaming {
     body.put("partition", "0");
     body.put("type", type);
     body.put("offset", offset);
+    if (type.equals("AT_TIME")){
+      //One hour back
+      //Date startTime = new Date(System.currentTimeMillis() - 3600 * 1000);
+      Date startTime = new Date(System.currentTimeMillis() - 60 * 1000);
+      String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(startTime);
+      body.put("time", timestamp);
+    }
     return body.toString();
   }
 

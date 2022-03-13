@@ -19,12 +19,13 @@ public class ParticipantDataRepository {
       String query = new String(Files.readAllBytes(file.toPath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, packetHeaderID);
-        stmt.setInt(2, participantData.AiControlled);
-        stmt.setInt(3, participantData.DriverId);
-        stmt.setString(4, gdc.Team(participantData.TeamId));
-        stmt.setInt(5, participantData.RaceNumber);
-        stmt.setString(6, gdc.Nationality(participantData.Nationality));
-        stmt.setString(7, participantData.Name);
+        stmt.setInt(2, participantData.Index);
+        stmt.setInt(3, participantData.AiControlled);
+        stmt.setInt(4, participantData.DriverId);
+        stmt.setString(5, gdc.Team(participantData.TeamId));
+        stmt.setInt(6, participantData.RaceNumber);
+        stmt.setString(7, gdc.Nationality(participantData.Nationality));
+        stmt.setString(8, participantData.Name);
         stmt.executeUpdate();
       }
     } catch (Exception ex) {

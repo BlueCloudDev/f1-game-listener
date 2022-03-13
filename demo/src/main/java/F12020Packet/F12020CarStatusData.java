@@ -2,6 +2,10 @@ package F12020Packet;
 
 public class F12020CarStatusData {
   /**
+   * Index of car status data in array
+   */
+  public int Index;
+  /**
    * 0 (off) - 2 (high)
    */
   public short TractionControl;

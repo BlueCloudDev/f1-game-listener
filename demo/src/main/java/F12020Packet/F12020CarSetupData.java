@@ -2,6 +2,10 @@ package F12020Packet;
 
 public class F12020CarSetupData {
   /**
+   * Index of car data in array
+   */
+  public int Index;
+  /**
    * Front wing aero
    */
   public short FrontWing;
