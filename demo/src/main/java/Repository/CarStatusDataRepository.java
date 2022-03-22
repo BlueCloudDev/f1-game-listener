@@ -2,20 +2,27 @@ package Repository;
 
 import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import Configuration.Configuration;
 import Converter.GameDataConverter;
 import F12020Packet.F12020CarStatusData;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 
 public class CarStatusDataRepository {
+  private static final Logger logger = LogManager.getLogger(CarStatusDataRepository.class);
   private GameDataConverter gdc = new GameDataConverter();
+  private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
   public void InsertCarStatusData(long packetHeaderID, F12020CarStatusData statusData, OracleDataSource dataSource) {
     try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
       con.setAutoCommit(true);
-      File file = new File("/home/opc/f1-game-listener/demo/src/InsertCarStatusData.sql");
-      String query = new String(Files.readAllBytes(file.toPath()));
+      var path = Paths.get(SQL_FOLDER, "InsertCarStatusData.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, packetHeaderID);
         stmt.setInt(2, statusData.Index);
@@ -58,7 +65,7 @@ public class CarStatusDataRepository {
         stmt.executeUpdate();
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
+      logger.warn(ex.getMessage());
     }
   }
 

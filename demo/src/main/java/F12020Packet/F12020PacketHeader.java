@@ -7,6 +7,10 @@ public class F12020PacketHeader {
    */
   public int PacketFormat;
   /**
+   * Player name assigned via PLAYER_NAME environment variable on the server
+   */
+  public String PlayerName;
+  /**
    * Game major version - "X.00"
    */
   public short GameMajorVersion;

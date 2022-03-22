@@ -3,14 +3,16 @@ package Repository;
 import java.sql.SQLException;
 import java.util.Properties;
 
+import Configuration.Configuration;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 
 public class OracleDataSourceProvider {
+  
   public OracleDataSource GetOracleDataSource() throws SQLException {
-    String DB_URL="jdbc:oracle:thin:@esports_high?TNS_ADMIN=/home/opc/Wallet";
-    String DB_USER="admin";
-    String DB_PASSWORD="FastestP12&3";
+    String DB_URL = Configuration.EnvVars.get("DB_URL");
+    String DB_USER = Configuration.EnvVars.get("DB_USER");
+    String DB_PASSWORD = Configuration.EnvVars.get("DB_PASSWORD");
 
     Properties info = new Properties();     
     info.put(OracleConnection.CONNECTION_PROPERTY_USER_NAME, DB_USER);

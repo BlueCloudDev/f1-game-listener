@@ -14,6 +14,7 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import Configuration.Configuration;
 import F12020Packet.F12020PacketMotionData;
 import F12020Packet.F12020PacketParticipantData;
 import F12020Packet.F12020PacketSessionData;
@@ -71,22 +72,22 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class OCIStreaming {
+  private static final Logger logger = LogManager.getLogger(OCIStreaming.class);
   private CloseableHttpClient  httpClient; 
-  private Map<String, String> config = new HashMap<String, String>();
-  private String streamID = "ocid1.stream.oc1.uk-london-1.amaaaaaaywfcc6aabs22e3r4cwsqmh63gjej4lhsybgtdnfbogxckwp3cdha";
-  private String host = "cell-1.streaming.uk-london-1.oci.oraclecloud.com";
-  private String configFilePath = "/home/opc/.oci/config";
+  private final String API_HOST = Configuration.EnvVars.get("API_HOST");
+  private final String STREAM_OCID = Configuration.EnvVars.get("STREAM_OCID");
+  private final String TENANCY_OCID = Configuration.EnvVars.get("TENANCY_OCID");
+  private final String USER_OCID = Configuration.EnvVars.get("USER_OCID");
+  private final String FINGERPRINT = Configuration.EnvVars.get("FINGERPRINT");
+  private final String OCI_PRIV_KEY_PATH = Configuration.EnvVars.get("OCI_PRIV_KEY_PATH");
   private String cursorID = "";
   private static long offset = 0;
 
   public OCIStreaming() throws OCIStreamingException, Exception {
-    
-    config = new HashMap<String, String>(); 
-    if(!readEnvVariables()) {
-      OCIStreamingException ex = new OCIStreamingException("Error reading configuration file");
-      throw ex;
-    }
     httpClient = HttpClients.custom()
     .setMaxConnTotal(100)
     .setMaxConnPerRoute(20)
@@ -101,7 +102,6 @@ public class OCIStreaming {
       try (CloseableHttpResponse response = httpClient.execute(req)) {
         EntityUtils.consumeQuietly(response.getEntity());
       }
-      //System.out.println(res);
     }
   }
 
@@ -121,6 +121,7 @@ public class OCIStreaming {
     if (!result.equals("[]")) {
       if (!result.startsWith("[")){
         System.out.println(result);
+        logger.warn("Invalid message format received: " + result);
         return;
       }
       JSONArray respBody = new JSONArray(result);
@@ -131,10 +132,6 @@ public class OCIStreaming {
       range.parallelStream().forEach(number ->
         processEntry((JSONObject)respBody.get(number), ods)
       );
-      /*for(int i=0; i<respBody.length(); i++) {
-        JSONObject msg = respBody.getJSONObject(i);
-        
-      }*/
     }
   }
 
@@ -144,15 +141,15 @@ public class OCIStreaming {
         if (offset < msgOffset) {
           offset = msgOffset;
         }
-        //String key = Base64Decode(msg.getString("key"));
-        //String[] keyItems = key.split(",");
-        //int packetId =  Integer.parseInt(keyItems[0]);
+
         String value = Base64Decode(msg.getString("value"));
         if (!value.startsWith("[")) {
+          logger.warn("Invalid message format received: " + value);
           return;
         }
         JSONArray ja = new JSONArray(value);
         if (ja.length() == 0 || !ja.get(0).toString().startsWith("{")) {
+          logger.warn("Invalid message format received: " + value);
           return;
         }
         F12020PacketHeader header = gson.fromJson(ja.get(0).toString(), F12020PacketHeader.class);
@@ -191,7 +188,9 @@ public class OCIStreaming {
             F12020PacketParticipantData p4 = gson.fromJson(ja.get(1).toString(), F12020PacketParticipantData.class);
             ParticipantDataRepository repo3 = new ParticipantDataRepository();
             for (F12020ParticipantData data : p4.ParticipantData) {
-              repo3.InsertParticipantData(id, data, ods);
+              if (data != null) {
+                repo3.InsertParticipantData(id, data, ods);
+              }
             }
             break;
           case 5:
@@ -233,7 +232,7 @@ public class OCIStreaming {
 
   public HttpUriRequest buildPostRequest(String body, String endpoint) throws URISyntaxException, Exception {
     body = body + "\n";
-    String restAPI = "/20180418/streams/"+ streamID + "/" + endpoint;
+    String restAPI = "/20180418/streams/"+ STREAM_OCID + "/" + endpoint;
     DateTimeFormatter dtf = DateTimeFormatter.RFC_1123_DATE_TIME;
     ZonedDateTime now = ZonedDateTime.now();
     String dateRFC1123Now = dtf.format(now);
@@ -242,14 +241,14 @@ public class OCIStreaming {
     String headers = "(request-target) date host x-content-sha256 content-type content-length";
     String requestTarget = "(request-target): post " + restAPI;
     String dateHeader = "date: " + dateRFC1123Now;
-    String hostHeader = "host: " + host;
+    String hostHeader = "host: " + API_HOST;
     String contentSha256Header = "x-content-sha256: " + bodyDigest;
     String contentTypeHeader = "content-type: application/json";
     String contentLengthHeader = "content-length: " + bodyDigestLength;
-    String signature = postSignature(requestTarget, dateHeader, hostHeader, contentSha256Header, contentTypeHeader, contentLengthHeader, config.get("key_file"));
-    String payload = "Signature version=\"1\",keyId=\"" + config.get("tenancy") + "/" + config.get("user") + "/" + config.get("fingerprint") + "\",algorithm=\"rsa-sha256\",headers=\"" + headers + "\",signature=\"" + signature +"\"";
+    String signature = postSignature(requestTarget, dateHeader, hostHeader, contentSha256Header, contentTypeHeader, contentLengthHeader, OCI_PRIV_KEY_PATH);
+    String payload = "Signature version=\"1\",keyId=\"" + TENANCY_OCID + "/" + USER_OCID + "/" + FINGERPRINT + "\",algorithm=\"rsa-sha256\",headers=\"" + headers + "\",signature=\"" + signature +"\"";
 
-    URI url = new URI("https://" + host + restAPI);
+    URI url = new URI("https://" + API_HOST + restAPI);
     StringEntity entity = new StringEntity(body);
     entity.setContentType("application/json");
     HttpUriRequest request = RequestBuilder.post()
@@ -267,7 +266,7 @@ public class OCIStreaming {
   public HttpUriRequest buildGetRequest() {
     HttpUriRequest request = null;
     try {
-      String restAPI = "/20180418/streams/" + streamID + "/messages?cursor="+cursorID;
+      String restAPI = "/20180418/streams/" + STREAM_OCID + "/messages?cursor="+cursorID;
       
       DateTimeFormatter dtf = DateTimeFormatter.RFC_1123_DATE_TIME;
       ZonedDateTime now = ZonedDateTime.now();
@@ -275,11 +274,11 @@ public class OCIStreaming {
       String headers = "(request-target) date host";
       String requestTarget = "(request-target): get " + restAPI;
       String dateHeader = "date: " + dateRFC1123Now;
-      String hostHeader = "host: " + host;
-      String signature = getSignature(requestTarget, dateHeader, hostHeader, config.get("key_file"));
-      String payload = "Signature version=\"1\",keyId=\"" + config.get("tenancy") + "/" + config.get("user") + "/" + config.get("fingerprint") + "\",algorithm=\"rsa-sha256\",headers=\"" + headers + "\",signature=\"" + signature +"\"";
+      String hostHeader = "host: " + API_HOST;
+      String signature = getSignature(requestTarget, dateHeader, hostHeader, OCI_PRIV_KEY_PATH);
+      String payload = "Signature version=\"1\",keyId=\"" + TENANCY_OCID + "/" + USER_OCID + "/" + FINGERPRINT + "\",algorithm=\"rsa-sha256\",headers=\"" + headers + "\",signature=\"" + signature +"\"";
 
-      URI url = new URI("https://" + host + restAPI);
+      URI url = new URI("https://" + API_HOST + restAPI);
       request = RequestBuilder.get()
       .setUri(url)
       .setHeader("content-type", "application/json")
@@ -287,7 +286,7 @@ public class OCIStreaming {
       .setHeader("Authorization", payload)
       .build();
     } catch (Exception ex) {
-      ex.printStackTrace();
+      logger.warn(ex.getMessage());
     }
     return request;
   }
@@ -329,7 +328,7 @@ public class OCIStreaming {
       String result = Base64.getEncoder().encodeToString(shaValue);
       return result;
     } catch (Exception ex) {
-      ex.printStackTrace();
+      logger.warn(ex.getMessage());
       return "";
     }
   }
@@ -362,7 +361,7 @@ public class OCIStreaming {
       String cleaned = base64enc.replace("\n", "").replace("\r", "");
       return cleaned;
     } catch (Exception ex) {
-      ex.printStackTrace();
+      logger.warn(ex.getMessage());
       return "";
     }
   }
@@ -382,32 +381,5 @@ public class OCIStreaming {
     KeyFactory keyFactory = KeyFactory.getInstance("RSA");
     PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(encoded);
     return keyFactory.generatePrivate(keySpec);
-  }
-
-  private boolean readEnvVariables() {
-    String[] vars = new String[]{"key_file", "fingerprint", "tenancy", "user"};
-    try {
-      File myObj = new File(configFilePath);
-      Scanner myReader = new Scanner(myObj);
-      while (myReader.hasNextLine()) {
-        String data = myReader.nextLine();
-        if (data.contains("=")){
-          String[] kv = data.split("=");
-          config.put(kv[0], kv[1]);
-        }
-      }
-      for (String var : vars) {
-        if (!config.containsKey(var) || config.get(var) == "") {
-          System.out.println(var + "is missing or invalid from " + configFilePath); 
-          return false;
-        }
-      }
-      myReader.close();
-    } catch (FileNotFoundException e) {
-      System.out.println("An error occurred.");
-      e.printStackTrace();  
-      return false;
-    }
-    return true;
   }
 }

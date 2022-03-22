@@ -5,20 +5,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.net.Socket;
 import java.net.SocketException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-import java.util.Base64;
 
 import com.google.gson.Gson;
 
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.json.JSONArray;
-import org.json.JSONObject;
 
 import F12020Packet.F12020PacketCarSetupData;
 import F12020Packet.F12020PacketCarStatusData;
@@ -35,11 +30,16 @@ import F12020Packet.F12020PacketSessionData;
 import OCIStreaming.OCIStreaming;
 import OCIStreaming.OCIStreamingException;
 import OCIStreaming.OCIStreamingMessage;
+import Configuration.Configuration;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class UDPListener {
+  private static final Logger logger = LogManager.getLogger(UDPListener.class);
   CloseableHttpClient httpClient;
   private boolean stop = false;
-  private int port = 20777;
+  private int port = Integer.parseInt(Configuration.EnvVars.get("PORT"));
   private static int MAX_BUFFER = 2048;
   private OCIStreaming streaming;
 
@@ -48,26 +48,6 @@ public class UDPListener {
     streaming = new OCIStreaming();
 
   }
-
-  /*public void Listen() throws SocketException, IOException, Exception {
-    DatagramSocket dsocket = new DatagramSocket(port);
-    final byte[] buffer = new byte[MAX_BUFFER];
-    DatagramPacket packet = new DatagramPacket(buffer, buffer.length);
-
-    // Now loop forever, waiting to receive packets and printing them.
-    int count = 0;
-    while (true) {
-      // Wait to receive a datagram
-      dsocket.receive(packet);
-      // Send contents to Controller
-      ReadPacket(buffer);
-
-      // Reset the length of the packet before reusing it.
-      packet.setLength(buffer.length);
-      count = count + 1;
-      System.out.println(count);
-    }
-  }*/
 
   public void Listen() throws SocketException, IOException, Exception {
     DatagramSocket socket = new DatagramSocket(port);
@@ -83,7 +63,9 @@ public class UDPListener {
       packet = new DatagramPacket(buf, buf.length, address, port);
       ReadPacket(packet.getData());
       count = count + 1;
-      System.out.println(count);
+      if (count % 1000 == 0) {
+        logger.info("Messages Processed: " + count);
+      }
     }
   }
 
@@ -106,7 +88,6 @@ public class UDPListener {
         case 0:
           F12020PacketMotionData motion = factory.CreatePacketMotionData(bb);
           body = gson.toJson(motion);
-          //payload = osm.Build("header.PacketId + "," + header.SessionUID.toString()", headerJson, body);
           payload = osm.Build(key, headerJson, body);
           streaming.SendMessage(payload);
           return;
@@ -169,7 +150,7 @@ public class UDPListener {
           System.out.println(header.PacketId);
       }
     } catch (IllegalArgumentException ex) {
-      ex.printStackTrace();
+      logger.warn(ex.getMessage());
     }
   }
 }

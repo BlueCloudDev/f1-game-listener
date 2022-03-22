@@ -1,20 +1,25 @@
 package Repository;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.sql.PreparedStatement;
 
+import Configuration.Configuration;
 import F12020Packet.F12020CarTelemetryData;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 
-public class CarTelemetryRepository {
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
+public class CarTelemetryRepository {
+  private static final Logger logger = LogManager.getLogger(CarTelemetryRepository.class);
+  private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
   public void InsertCarTelemetryData(long packetHeaderID, F12020CarTelemetryData telemetryData, OracleDataSource dataSource) {
     try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
       con.setAutoCommit(true);
-      File file = new File("/home/opc/f1-game-listener/demo/src/InsertCarTelemetryData.sql");
-      String query = new String(Files.readAllBytes(file.toPath()));
+      var path = Paths.get(SQL_FOLDER, "InsertCarTelemetryData.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, packetHeaderID);
         stmt.setInt(2, telemetryData.Index);
@@ -51,7 +56,7 @@ public class CarTelemetryRepository {
         stmt.executeUpdate();
       }
     } catch (Exception ex) {
-      ex.printStackTrace();
+      logger.warn(ex.getMessage());
     }
   }
 

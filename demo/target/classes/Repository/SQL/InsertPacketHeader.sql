@@ -1,4 +1,6 @@
 INSERT INTO t_packet_header (
+  m_player_id,
+  m_player_name,
   m_packet_format,
   m_game_major_version,
   m_game_minor_version,
@@ -9,4 +11,4 @@ INSERT INTO t_packet_header (
   m_frame_identifier,
   m_player_car_index,
   m_secondary_player_car_index
-) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)

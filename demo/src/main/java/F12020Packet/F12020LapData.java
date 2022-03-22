@@ -2,6 +2,10 @@ package F12020Packet;
 
 public class F12020LapData {
   /**
+   * Index of the lap data in packet array
+   */
+  public int Index;
+  /**
    * Last lap time in seconds                               
    */
   public float LastLapTime;

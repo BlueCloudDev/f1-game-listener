@@ -6,15 +6,16 @@ import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
+import Configuration.Configuration;
+
 public class F12020PacketFactory {
-  public static final int HEADER_SIZE = 36;
-  public static final int MOTION_SIZE = 1464;
-  public static final int CAR_MOTION_SIZE = 60;
   public Converter converter = new Converter();
+  public final String PLAYER_NAME = Configuration.EnvVars.get("PLAYER_NAME");
 
   public F12020PacketHeader CreatePacketHeader(ByteBuffer bb){
     F12020PacketHeader p = new F12020PacketHeader();
     p.PacketFormat = converter.Uint16(bb.getShort());
+    p.PlayerName = PLAYER_NAME;
     p.GameMajorVersion = converter.Uint8(bb.get());
     p.GameMinorVersion = converter.Uint8(bb.get());
     p.PacketVersion = converter.Uint8(bb.get());
@@ -158,6 +159,7 @@ public class F12020PacketFactory {
     F12020PacketLapData p = new F12020PacketLapData();
     for(int i = 0; i < p.LapData.length; i++) {
       p.LapData[i] = CreateLapData(bb);
+      p.LapData[i].Index = i;
     }
     return p;
   }
