@@ -10,6 +10,7 @@ import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 import Configuration.Configuration;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -49,7 +50,8 @@ public class CarSetupDataRepository {
         stmt.executeUpdate();
       }
     } catch (Exception ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
     }
   }
 

@@ -28,7 +28,7 @@ public class Configuration {
     "DB_PASSWORD" 
   };
   private final String[] listenerKeys = {
-    "PORT",
+    "LISTEN_PORT",
     "PLAYER_NAME"
   };
   public boolean ReadEnvVars() {

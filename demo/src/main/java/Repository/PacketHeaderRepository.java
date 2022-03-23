@@ -7,6 +7,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLIntegrityConstraintViolationException;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -48,7 +49,8 @@ public class PacketHeaderRepository {
       return id;
     } 
     catch (Exception ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
     }
     return id;
   }

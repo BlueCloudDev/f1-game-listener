@@ -11,6 +11,7 @@ import F12020Packet.F12020ParticipantData;
 import oracle.jdbc.OracleConnection;
 import oracle.jdbc.pool.OracleDataSource;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -35,7 +36,8 @@ public class ParticipantDataRepository {
         stmt.executeUpdate();
       }
     } catch (Exception ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
     }
   }
 

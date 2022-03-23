@@ -18,7 +18,7 @@ CREATE TABLE t_packet_header (
   m_game_minor_version NUMBER,
   m_packet_version NUMBER,
   m_packet_id NUMBER,
-  m_session_UID NUMBER,
+  m_session_UID NUMBER NOT NULL,
   m_session_time NUMBER,
   m_frame_identifier NUMBER,
   m_player_car_index NUMBER,

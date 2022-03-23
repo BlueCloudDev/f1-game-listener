@@ -1,6 +1,7 @@
 package OCIStreaming;
 
 import org.apache.http.HttpResponse;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
@@ -92,7 +93,9 @@ public class OCIStreaming {
     .setMaxConnTotal(100)
     .setMaxConnPerRoute(20)
     .build();
-    cursorID = getCursorID("AT_TIME", offset);
+    if (OCIStreaming.offset == 0) {
+      cursorID = getCursorID("AT_TIME", offset);
+    }
   }
 
   public void SendMessage(String body) throws IOException, ClientProtocolException, Exception {
@@ -111,13 +114,13 @@ public class OCIStreaming {
     OracleDataSourceProvider odsp = new OracleDataSourceProvider();
     OracleDataSource ods = odsp.GetOracleDataSource();
     
+    if (OCIStreaming.offset > 0) {
+      cursorID = getCursorID("AFTER_OFFSET", OCIStreaming.offset);
+    }
     HttpUriRequest req = buildGetRequest();
     HttpResponse resp = httpClient.execute(req);
     HttpEntity entity = resp.getEntity();
     String result = EntityUtils.toString(entity);
-    if (offset > 0) {
-      cursorID = getCursorID("AFTER_OFFSET", offset);
-    }
     if (!result.equals("[]")) {
       if (!result.startsWith("[")){
         System.out.println(result);
@@ -286,7 +289,8 @@ public class OCIStreaming {
       .setHeader("Authorization", payload)
       .build();
     } catch (Exception ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
     }
     return request;
   }
@@ -309,13 +313,16 @@ public class OCIStreaming {
     JSONObject body = new JSONObject();
     body.put("partition", "0");
     body.put("type", type);
-    body.put("offset", offset);
     if (type.equals("AT_TIME")){
       //One hour back
       //Date startTime = new Date(System.currentTimeMillis() - 3600 * 1000);
       Date startTime = new Date(System.currentTimeMillis() - 60 * 1000);
       String timestamp = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX").format(startTime);
+      logger.info("Creating cursor at time: " + timestamp);
       body.put("time", timestamp);
+    } else {
+      logger.info("Creating cursor at offset: " + OCIStreaming.offset);
+      body.put("offset", offset);
     }
     return body.toString();
   }
@@ -328,7 +335,8 @@ public class OCIStreaming {
       String result = Base64.getEncoder().encodeToString(shaValue);
       return result;
     } catch (Exception ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
       return "";
     }
   }
@@ -361,7 +369,8 @@ public class OCIStreaming {
       String cleaned = base64enc.replace("\n", "").replace("\r", "");
       return cleaned;
     } catch (Exception ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
       return "";
     }
   }

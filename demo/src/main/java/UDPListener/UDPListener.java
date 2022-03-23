@@ -12,6 +12,7 @@ import java.nio.ByteOrder;
 
 import com.google.gson.Gson;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.impl.client.CloseableHttpClient;
 
@@ -39,7 +40,7 @@ public class UDPListener {
   private static final Logger logger = LogManager.getLogger(UDPListener.class);
   CloseableHttpClient httpClient;
   private boolean stop = false;
-  private int port = Integer.parseInt(Configuration.EnvVars.get("PORT"));
+  private int port = Integer.parseInt(Configuration.EnvVars.get("LISTEN_PORT"));
   private static int MAX_BUFFER = 2048;
   private OCIStreaming streaming;
 
@@ -150,7 +151,8 @@ public class UDPListener {
           System.out.println(header.PacketId);
       }
     } catch (IllegalArgumentException ex) {
-      logger.warn(ex.getMessage());
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.fatal(stackTrace);
     }
   }
 }
