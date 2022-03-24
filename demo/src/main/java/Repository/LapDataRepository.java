@@ -1,6 +1,5 @@
 package Repository;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
@@ -26,8 +25,8 @@ public class LapDataRepository {
       var path = Paths.get(SQL_FOLDER, "InsertLapData.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
-        stmt.setLong(1, packetHeaderID);
-        stmt.setInt(2, lapData.Index);
+        stmt.setInt(1, lapData.Index);  
+        stmt.setLong(2, packetHeaderID);
         stmt.setFloat(3, lapData.LastLapTime);
         stmt.setFloat(4, lapData.CurrentLapTime);
         stmt.setInt(5, lapData.Sector1TimeInMS);

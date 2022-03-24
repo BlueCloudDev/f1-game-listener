@@ -4,7 +4,6 @@ import org.apache.http.HttpResponse;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
@@ -60,18 +59,11 @@ import java.util.Base64;
 import java.util.Date;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Scanner;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.Charset;
 
