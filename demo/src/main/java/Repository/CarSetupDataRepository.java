@@ -2,12 +2,12 @@ package Repository;
 
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 
 import F12020Packet.F12020CarSetupData;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.jdbc.PoolDataSource;
 import Configuration.Configuration;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -17,8 +17,8 @@ import org.apache.logging.log4j.Logger;
 public class CarSetupDataRepository {
   private static final Logger logger = LogManager.getLogger(CarSetupDataRepository.class);
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public void InsertCarSetupData(long packetHeaderID, F12020CarSetupData carSetupData, OracleDataSource dataSource) {
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+  public void InsertCarSetupData(long packetHeaderID, F12020CarSetupData carSetupData, PoolDataSource dataSource) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertCarSetupData.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));

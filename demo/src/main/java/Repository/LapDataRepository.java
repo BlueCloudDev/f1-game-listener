@@ -3,13 +3,13 @@ package Repository;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import Configuration.Configuration;
 import Converter.GameDataConverter;
 import F12020Packet.F12020LapData;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -20,8 +20,8 @@ public class LapDataRepository {
   private static final Logger logger = LogManager.getLogger(LapDataRepository.class);
   private GameDataConverter gdc = new GameDataConverter();
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public void InsertLapData(long packetHeaderID, F12020LapData lapData, OracleDataSource dataSource) {
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+  public void InsertLapData(long packetHeaderID, F12020LapData lapData, PoolDataSource dataSource) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertLapData.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));

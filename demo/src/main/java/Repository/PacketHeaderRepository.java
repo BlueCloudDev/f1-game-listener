@@ -1,8 +1,8 @@
 package Repository;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLIntegrityConstraintViolationException;
@@ -13,15 +13,14 @@ import org.apache.logging.log4j.Logger;
 
 import Configuration.Configuration;
 import F12020Packet.F12020PacketHeader;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.jdbc.PoolDataSource;
 
 public class PacketHeaderRepository {
   private static final Logger logger = LogManager.getLogger(PacketHeaderRepository.class);
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public long InsertPacketHeader(F12020PacketHeader packetHeader, OracleDataSource dataSource) {
+  public long InsertPacketHeader(F12020PacketHeader packetHeader, PoolDataSource dataSource) {
     long id = 0;
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertPacketHeader.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));

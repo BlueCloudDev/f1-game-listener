@@ -3,6 +3,7 @@ package Repository;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -12,15 +13,14 @@ import org.apache.logging.log4j.Logger;
 import Configuration.Configuration;
 import Converter.GameDataConverter;
 import F12020Packet.F12020CarStatusData;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.jdbc.PoolDataSource;
 
 public class CarStatusDataRepository {
   private static final Logger logger = LogManager.getLogger(CarStatusDataRepository.class);
   private GameDataConverter gdc = new GameDataConverter();
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public void InsertCarStatusData(long packetHeaderID, F12020CarStatusData statusData, OracleDataSource dataSource) {
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+  public void InsertCarStatusData(long packetHeaderID, F12020CarStatusData statusData, PoolDataSource dataSource) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertCarStatusData.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));

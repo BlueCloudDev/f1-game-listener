@@ -1,16 +1,15 @@
 package Repository;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
 import Configuration.Configuration;
 import F12020Packet.F12020CarMotionData;
 import F12020Packet.F12020PacketMotionData;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -20,9 +19,9 @@ import org.apache.logging.log4j.Logger;
 public class MotionDataRepository {
   private static final Logger logger = LogManager.getLogger(MotionDataRepository.class);
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public Long InsertMotionData(long packetHeaderID, F12020CarMotionData motionData, OracleDataSource dataSource) {
+  public Long InsertMotionData(long packetHeaderID, F12020CarMotionData motionData, PoolDataSource dataSource) {
     long id = 0;
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertCarMotionData.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
@@ -62,9 +61,9 @@ public class MotionDataRepository {
     return id;
   }
 
-  public void InsertMotionDataPlayer(long carMotionDataId, F12020PacketMotionData motionData, OracleDataSource dataSource) {
+  public void InsertMotionDataPlayer(long carMotionDataId, F12020PacketMotionData motionData, PoolDataSource dataSource) {
     long id = 0;
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertCarMotionDataPlayer.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));

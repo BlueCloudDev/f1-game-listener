@@ -1,8 +1,8 @@
 package Repository;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 
@@ -11,8 +11,7 @@ import Converter.GameDataConverter;
 import F12020Packet.F12020MarshalZone;
 import F12020Packet.F12020PacketSessionData;
 import F12020Packet.F12020WeatherForecastSample;
-import oracle.jdbc.OracleConnection;
-import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -22,8 +21,8 @@ public class SessionDataRepository {
   private static final Logger logger = LogManager.getLogger(SessionDataRepository.class);
   private GameDataConverter gdc = new GameDataConverter();
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public void InsertSessionData(long packetHeaderID, F12020PacketSessionData sessionData, OracleDataSource dataSource) {
-    try (OracleConnection con = (OracleConnection) dataSource.getConnection()) {
+  public void InsertSessionData(long packetHeaderID, F12020PacketSessionData sessionData, PoolDataSource dataSource) {
+    try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "InsertSessionData.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));

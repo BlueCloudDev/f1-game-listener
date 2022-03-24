@@ -30,6 +30,8 @@ import Repository.PacketHeaderRepository;
 import Repository.ParticipantDataRepository;
 import Repository.SessionDataRepository;
 import oracle.jdbc.pool.OracleDataSource;
+import oracle.ucp.common.waitfreepool.Pool;
+import oracle.ucp.jdbc.PoolDataSource;
 import F12020Packet.F12020CarSetupData;
 import F12020Packet.F12020CarStatusData;
 import F12020Packet.F12020CarTelemetryData;
@@ -78,6 +80,7 @@ import org.apache.logging.log4j.Logger;
 
 public class OCIStreaming {
   private static final Logger logger = LogManager.getLogger(OCIStreaming.class);
+  private static PoolDataSource pds = null;
   private CloseableHttpClient  httpClient; 
   private final String API_HOST = Configuration.EnvVars.get("API_HOST");
   private final String STREAM_OCID = Configuration.EnvVars.get("STREAM_OCID");
@@ -93,6 +96,10 @@ public class OCIStreaming {
     .setMaxConnTotal(100)
     .setMaxConnPerRoute(20)
     .build();
+    if (pds == null) {
+      OracleDataSourceProvider odsp = new OracleDataSourceProvider();
+      pds = odsp.GetOraclePoolDataSource();
+    }
     if (OCIStreaming.offset == 0) {
       cursorID = getCursorID("AT_TIME", offset);
     }
@@ -111,8 +118,6 @@ public class OCIStreaming {
   
 
   public void GetMessage() throws IOException, ClientProtocolException, SQLException, Exception {
-    OracleDataSourceProvider odsp = new OracleDataSourceProvider();
-    OracleDataSource ods = odsp.GetOracleDataSource();
     
     if (OCIStreaming.offset > 0) {
       cursorID = getCursorID("AFTER_OFFSET", OCIStreaming.offset);
@@ -133,12 +138,12 @@ public class OCIStreaming {
         range.add(i);
       }
       range.parallelStream().forEach(number ->
-        processEntry((JSONObject)respBody.get(number), ods)
+        processEntry((JSONObject)respBody.get(number), pds)
       );
     }
   }
 
-  public void processEntry(JSONObject msg, OracleDataSource ods) {
+  public void processEntry(JSONObject msg, PoolDataSource pds) {
         Gson gson = new Gson();
         long msgOffset = msg.getLong("offset");
         if (offset < msgOffset) {
@@ -157,7 +162,7 @@ public class OCIStreaming {
         }
         F12020PacketHeader header = gson.fromJson(ja.get(0).toString(), F12020PacketHeader.class);
         PacketHeaderRepository prepo = new PacketHeaderRepository();
-        long id = prepo.InsertPacketHeader(header, ods);
+        long id = prepo.InsertPacketHeader(header, pds);
         if (id == 0) {
           return;
         }
@@ -166,22 +171,22 @@ public class OCIStreaming {
             F12020PacketMotionData p = gson.fromJson(ja.get(1).toString(), F12020PacketMotionData.class);
             MotionDataRepository mrepo = new MotionDataRepository();
             for(int j = 0; j < p.CarMotionData.length; j++) {
-              long mdid = mrepo.InsertMotionData(id, p.CarMotionData[j], ods);
+              long mdid = mrepo.InsertMotionData(id, p.CarMotionData[j], pds);
               if (j == (int)header.PlayerCarIndex){
-                mrepo.InsertMotionDataPlayer(mdid, p, ods);
+                mrepo.InsertMotionDataPlayer(mdid, p, pds);
               }
             }
             break;
           case 1:
             F12020PacketSessionData p1 = gson.fromJson(ja.get(1).toString(), F12020PacketSessionData.class);
             SessionDataRepository repo = new SessionDataRepository();
-            repo.InsertSessionData(id, p1, ods);
+            repo.InsertSessionData(id, p1, pds);
             break;
           case 2:
             F12020PacketLapData p2 = gson.fromJson(ja.get(1).toString(), F12020PacketLapData.class);
             LapDataRepository repo2 = new LapDataRepository();
             for (F12020LapData data : p2.LapData) {
-              repo2.InsertLapData(id, data, ods);
+              repo2.InsertLapData(id, data, pds);
             }
             break;
           case 3:
@@ -192,7 +197,7 @@ public class OCIStreaming {
             ParticipantDataRepository repo3 = new ParticipantDataRepository();
             for (F12020ParticipantData data : p4.ParticipantData) {
               if (data != null) {
-                repo3.InsertParticipantData(id, data, ods);
+                repo3.InsertParticipantData(id, data, pds);
               }
             }
             break;
@@ -200,7 +205,7 @@ public class OCIStreaming {
             F12020PacketCarSetupData p5 = gson.fromJson(ja.get(1).toString(), F12020PacketCarSetupData.class);
             CarSetupDataRepository repo4 = new CarSetupDataRepository();
             for (F12020CarSetupData data : p5.CarSetups) {
-              repo4.InsertCarSetupData(id, data, ods);
+              repo4.InsertCarSetupData(id, data, pds);
             }
             break;
           case 6:
@@ -208,7 +213,7 @@ public class OCIStreaming {
             CarTelemetryRepository repo5 = new CarTelemetryRepository();
             for (F12020CarTelemetryData data : p6.CarTelemetryData) {
               if (data != null) {
-                repo5.InsertCarTelemetryData(id, data, ods);
+                repo5.InsertCarTelemetryData(id, data, pds);
               }
             }
             break;
@@ -216,7 +221,7 @@ public class OCIStreaming {
             F12020PacketCarStatusData p7 = gson.fromJson(ja.get(1).toString(), F12020PacketCarStatusData.class);
             CarStatusDataRepository repo6 = new CarStatusDataRepository();
             for (F12020CarStatusData data : p7.CarStatusData) {
-              repo6.InsertCarStatusData(id, data, ods);
+              repo6.InsertCarStatusData(id, data, pds);
             }
             break;  
           case 8:
