@@ -1,0 +1,31 @@
+INSERT INTO t_car_status_data_2021 (
+  m_packet_id,
+  m_index,
+  m_traction_control,
+  m_anti_lock_brakes,
+  m_fuel_mix,
+  m_front_brake_bias,
+  m_pit_limiter_status,
+  m_fuel_in_tank,
+  m_fuel_capacity,
+  m_fuel_remaining_laps,
+  m_max_rpm,
+  m_idel_rpm,
+  m_max_gears,
+  m_drs_allowed,
+  m_drs_activation_distance,
+  m_actual_tyre_compound,
+  m_visual_tyre_compound,
+  m_tyres_age_laps,
+  m_vehicle_fia_flags,
+  m_ers_store_energy,
+  m_ers_deploy_mode,
+  m_ers_harvested_this_lap_MGUK,
+  m_ers_harvested_this_lap_MGUH,
+  m_ers_deployed_this_lap,
+  m_network_paused
+) VALUES (
+  ?,?,?,?,?,?,?,?,?,?,
+  ?,?,?,?,?,?,?,?,?,?,
+  ?,?,?,?,?
+)
