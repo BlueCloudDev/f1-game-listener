@@ -1,6 +1,6 @@
 package Converter;
 
-public class GameDataConverter {
+public class GameDataConverter2021 {
   public String SessionType(short sessionType) {
     switch (sessionType) {
       case 0: return "Unknown";
@@ -28,6 +28,15 @@ public class GameDataConverter {
       case 3: return "Light Rain";
       case 4: return "Heavy Rain";
       case 5: return "Storm";
+      default: return "Default";
+    }
+  }
+
+  public String TemperatureChange(int temperatureChange) {
+    switch (temperatureChange) {
+      case 0: return "Up";
+      case 1: return "Down";
+      case 2: return "No Change";
       default: return "Default";
     }
   }
@@ -89,6 +98,50 @@ public class GameDataConverter {
     }
   }
 
+  public String ForecastAccuracy(int forecastAccuracy) {
+    switch (forecastAccuracy) {
+      case 0: return "Perfect";
+      case 1: return "Approximate";
+      default: return "Default";
+    }
+  }
+
+  public String BrakingAssist(int brakingAssist) {
+    switch (brakingAssist) {
+      case 0: return "Off";
+      case 1: return "Low";
+      case 2: return "Medium";
+      case 3: return "High";
+      default: return "Default";
+    }
+  }
+
+  public String GearBoxAssist(int gearboxAssist) {
+    switch (gearboxAssist) {
+      case 1: return "Manual";
+      case 2: return "Manual & Suggested Gear";
+      case 3: return "Auto";
+      default: return "Default"; 
+    }
+  }
+
+  public String DynamicRacingLine(int dynamicRacingLine) {
+    switch (dynamicRacingLine) {
+      case 0: return "Off";
+      case 1: return "Corners Only";
+      case 2: return "Full";
+      default: return "Default";
+    }
+  }
+
+  public String DynamicRacingLineType(int dynamicRacingLineType) {
+    switch (dynamicRacingLineType) {
+      case 0: return "2D";
+      case 1: return "3D";
+      default: return "Default";
+    }
+  }
+
   public String CurrentLapValid(short currentLapValid) {
     switch (currentLapValid) {
       case 0: return "Valid";
@@ -114,9 +167,10 @@ public class GameDataConverter {
       case 1: return "Inactive";
       case 2: return "Active";
       case 3: return "Finished";
-      case 4: return "Disqualified";
-      case 5: return "Not Classified";
-      case 6: return "Retired";
+      case 4: return "Did Not Finish";
+      case 5: return "Disqualified";
+      case 6: return "Not Classified";
+      case 7: return "Retired";
       default: return "Default";
     }
   }
@@ -217,7 +271,7 @@ public class GameDataConverter {
     }
   }
 
-  public String ErsDeployMode(short ersDeployMode) {
+  public String ErsDeployMode(int ersDeployMode) {
     switch (ersDeployMode) {
       case 0: return "None";
       case 1: return "Medium";
@@ -227,7 +281,24 @@ public class GameDataConverter {
     }
   }
 
-  public String TrackIDs (short trackID) {
+  public String ReadyStatus(int readyStatus) {
+    switch (readyStatus) {
+      case 0: return "Not Ready";
+      case 1: return "Ready";
+      case 2: return "Spectating";
+      default: return "Default";
+    }
+  }
+  public String TractionControl(int tractionControl) {
+    switch (tractionControl) {
+      case 0: return "Off";
+      case 1: return "Medium";
+      case 2: return "Full";
+      default: return "Default";
+    }
+  }
+
+  public String TrackIDs (int trackID) {
     switch (trackID) {
       case 0: return "Melbourne";
       case 1: return "Paul Ricard";
@@ -256,6 +327,9 @@ public class GameDataConverter {
       case 24: return "Suzuka Short";
       case 25: return "Hanoi";
       case 26: return "Zandvoort";
+      case 27: return "Imola";
+      case 28: return "Portimao";
+      case 29: return "Jeddah";
       default: return "Default";
     }
   }
@@ -317,39 +391,38 @@ public class GameDataConverter {
       case 53: return "Mongasque";
       case 54: return "New Zealander";
       case 55: return "Nicaraguan";
-      case 56: return "North Korean";
-      case 57: return "Northern Irish";
-      case 58: return "Norwegian";
-      case 59: return "Omani";
-      case 60: return "Pakistani";
-      case 61: return "Panamanian";
-      case 62: return "Paraguayan";
-      case 63: return "Peruvian";
-      case 64: return "Polish";
-      case 65: return "Portuguese";
-      case 66: return "Qatari";
-      case 67: return "Romanian";
-      case 68: return "Russian";
-      case 69: return "Salvadoran";
-      case 70: return "Saudi";
-      case 71: return "Scottish";
-      case 72: return "Serbian";
-      case 73: return "Singaporean";
-      case 74: return "Slovakian";
-      case 75: return "Slovenian";
-      case 76: return "South Korean";
-      case 77: return "South African";
-      case 78: return "Spanish";
-      case 79: return "Swedish";
-      case 80: return "Swiss";
-      case 81: return "Thai";
-      case 82: return "Turkish";
-      case 83: return "Uruguayan";
-      case 84: return "Ukrainian";
-      case 85: return "Venezuelan";
-      case 86: return "Welsh";
-      case 87: return "Barbadian";
-      case 88: return "Vietnamese";
+      case 56: return "Northern Irish";
+      case 57: return "Norwegian";
+      case 58: return "Omani";
+      case 59: return "Pakistani";
+      case 60: return "Panamanian";
+      case 61: return "Paraguayan";
+      case 62: return "Peruvian";
+      case 63: return "Polish";
+      case 64: return "Portuguese";
+      case 65: return "Qatari";
+      case 66: return "Romanian";
+      case 67: return "Russian";
+      case 68: return "Salvadoran";
+      case 69: return "Saudi";
+      case 70: return "Scottish";
+      case 71: return "Serbian";
+      case 72: return "Singaporean";
+      case 73: return "Slovakian";
+      case 74: return "Slovenian";
+      case 75: return "South Korean";
+      case 76: return "South African";
+      case 77: return "Spanish";
+      case 78: return "Swedish";
+      case 79: return "Swiss";
+      case 80: return "Thai";
+      case 81: return "Turkish";
+      case 82: return "Uruguayan";
+      case 83: return "Ukrainian";
+      case 84: return "Venezuelan";
+      case 85: return "Welsh";
+      case 86: return "Barbadian";
+      case 87: return "Vietnamese";
       default: return "Default";
     }
   }
@@ -454,50 +527,137 @@ public class GameDataConverter {
     }
   }
 
-  public String Team(short teamID) {
+  public String DriverId(int driverId) {
+    switch(driverId) {
+      case 0: return "Carlos Sainz";
+      case 1: return "Daniil Kvyat";
+      case 2: return "Daniel Ricciardo";
+      case 3: return "Fernando Alonso";
+      case 4: return "Filipe Massa";
+      case 6: return "Kimi Raikkonen";
+      case 7: return "Lewis Hamilton";
+      case 9: return "Max Verstappen";
+      case 10: return "Nico Hulkenburg";
+      case 11: return "Kevin Magnussen";
+      case 12: return "Romain Grosjean";
+      case 13: return "Sebastian Vettel";
+      case 14: return "Sergio Vettel";
+      case 15: return "Valtteri Bottas";
+      case 17: return "Esteban Ocon";
+      case 19: return "Lance Stroll";
+      case 20: return "Arron Barnes";
+      case 21: return "Martin Giles";
+      case 22: return "Alex Murray";
+      case 23: return "Lucas Roth";
+      case 24: return "Igor Vorreia";
+      case 25: return "Sophie Levasseur";
+      case 26: return "Jonas Schiffer";
+      case 27: return "Alain Forest";
+      case 28: return "Jay letourneau";
+      case 29: return "Esto Saari";
+      case 30: return "Yasar Atiyeh";
+      case 31: return "Callisto Calabresi";
+      case 32: return "Naota Izum";
+      case 33: return "Howard Clarke";
+      case 34: return "Wilheim Kaufmann";
+      case 35: return "Marie Laursen";
+      case 36: return "Flavio Nieves";
+      case 37: return "Peter Belousov";
+      case 38: return "Klimek Michalski";
+      case 39: return "Santiago Moreno";
+      case 40: return "Benjamin Coppens";
+      case 41: return "Noah Visser";
+      case 42: return "Gert Waldmuller";
+      case 43: return "Julian Quesada";
+      case 44: return "Daniel Jones";
+      case 45: return "Artem Markelov";
+      case 46: return "Tadasuke Makino";
+      case 47: return "Sean Galeal";
+      case 48: return "Nyck De Vries";
+      case 49: return "Jak Aitken";
+      case 50: return "George Russell";
+      case 51: return "Maximilian Gunther";
+      case 52: return "Nirei Fukuzumi";
+      case 53: return "Luca Ghiotto";
+      case 54: return "Lando Norris";
+      case 55: return "Sergio Sette Camara";
+      case 56: return "Louis Deletraz";
+      case 57: return "Antonio Fuoco";
+      case 58: return "Charles Leclerc";
+      case 59: return "Pierre Gasly";
+      case 62: return "Alexander Albon";
+      case 63: return "Nicholas Latifi";
+      case 64: return "Dorian Boccolacci";
+      case 65: return "Niko Kari";
+      case 66: return "Roberto Merhi";
+      case 67: return "Arjun Maini";
+      case 68: return "Alessio Lorandi";
+      case 69: return "Ruben Meijer";
+      case 70: return "Rashid Nair";
+      case 71: return "Jack Tremblay";
+      case 72: return "Devon Butler";
+      case 73: return "Lukas Weber";
+      case 74: return "Antonio Giovinazzi";
+      case 75: return "Robert Kubica";
+      case 76: return "Alain Prost";
+      case 77: return "Ayrton Senna";
+      case 78: return "Nobuharu Matushita";
+      case 79: return "Nikita Mazepin";
+      case 80: return "Guanya Zhou";
+      case 81: return "Mick Schumacher";
+      case 82: return "Callum Ilott";
+      case 83: return "Juan Manuel Correa";
+      case 84: return "Jordan King";
+      case 85: return "Mahaveer Raghunathan";
+      case 86: return "Tatiana Calderon";
+      case 87: return "Anthoine Hubert";
+      case 88: return "Guiliano Alesi";
+      case 89: return "Ralph Boschung";
+      case 90: return "Michael Schumacher";
+      case 91: return "Dan Ticktum";
+      case 92: return "Marcus Armstrong";
+      case 93: return "Christian Lundgaard";
+      case 94: return "Yuki Tsunoda";
+      case 95: return "Jehan Daruvala";
+      case 96: return "Gulherme Samaia";
+      case 97: return "Pedro Piquet";
+      case 98: return "Felipe Drugovich";
+      case 99: return "Robert Schwartzman";
+      case 100: return "Roy Nissany";
+      case 101: return "Marino Sato";
+      case 102: return "Aidan Jackson";
+      case 103: return "Casper Akkerman";
+      case 109: return "Jenson Button";
+      case 110: return "David Coulthard";
+      case 111: return "Nico Rosbert";
+      case 112: return "Oscar Piastri";
+      case 113: return "Liam Lawson";
+      case 114: return "Juri Vips";
+      case 115: return "Theo Pourchaire";
+      case 116: return "Richard Verschoor";
+      case 117: return "Lirim Zendeli";
+      case 118: return "David Beckmann";
+      case 119: return "Gianluca Petecof";
+      case 120: return "Matteo Nannini";
+      case 121: return "Alessio Deledda";
+      case 122: return "Bent Viscaal";
+      case 123: return "enzo Fittipaldi";
+      default: return "Default";
+    }
+  }
+
+  public String Team(int teamID) {
     switch (teamID) {
       case 0: return "Mercedes";
       case 1: return "Ferrari";
       case 2: return "Red Bull Racing";
       case 3: return "Williams";
-      case 4: return "Racing Point";
-      case 5: return "Renault";
+      case 4: return "Aston Martin";
+      case 5: return "Alpine";
       case 6: return "Alpha Tauri";
       case 7: return "Haas";
       case 8: return "McLaren";
       case 9: return "Alpha Romeo";
-      case 10: return "McLaren 1988";
-      case 11: return "McLaren 1991";
-      case 12: return "Williams 1992";
-      case 13: return "Ferrari 1995";
-      case 14: return "Williams 1996";
-      case 15: return "McLaren 1998";
-      case 16: return "Ferrari 2002";
-      case 17: return "Ferrari 2004";
-      case 18: return "Renault 2006";
-      case 19: return "Ferrari 2007";
-      case 20: return "McLaren 2008";
-      case 21: return "Red Bull 2010";
-      case 22: return "Ferrari 1976";
-      case 23: return "ART Grand Prix";
-      case 24: return "Campos Vexatec Racing";
-      case 25: return "Carlin";
-      case 26: return "Charouz Racing System";
-      case 27: return "DMAS";
-      case 28: return "Russian Time";
-      case 29: return "MP Motorsport";
-      case 30: return "Pertamina";
-      case 31: return "McLaren 1990";
-      case 32: return "Trident";
-      case 33: return "BWT Arden";
-      case 34: return "McLaren 1976";
-      case 35: return "Lotus 1972";
-      case 36: return "Ferrari 1979";
-      case 37: return "McLaren 1982";
-      case 38: return "Williams 2003";
-      case 39: return "Brawn 2009";
-      case 40: return "Lotus 1978";
-      case 41: return "F1 Generic Car";
       case 42: return "Art GP '19";
       case 43: return "Campos '19";
       case 44: return "Carlin '19";
@@ -508,10 +668,38 @@ public class GameDataConverter {
       case 49: return "Prema '19";
       case 50: return "Trident '19";
       case 51: return "Arden '19";
-      case 53: return "Benetton 1994";
-      case 54: return "Benetton 1995";
-      case 55: return "Ferrari 2000";
-      case 56: return "Jordan 1991";
+      case 70: return "Art GP '20";
+      case 71: return "Campos '20";
+      case 72: return "Carlin '20";
+      case 73: return "Charouz '20";
+      case 74: return "Dams '20";
+      case 75: return "Uni-Virtousi '20";
+      case 76: return "MP Motorsport '20";
+      case 77: return "Prema '20";
+      case 78: return "Trident '20";
+      case 79: return "BWT '20";
+      case 80: return "Hitech '20";
+      case 85: return "Mercedes 2020";
+      case 86: return "Ferrari 2020";
+      case 87: return "Red Bull 2020";
+      case 88: return "Williams 2020";
+      case 89: return "Racing Point 2020";
+      case 90: return "Renault 2020";
+      case 91: return "Alpha Tauri 2020";
+      case 92: return "Haas 2020";
+      case 93: return "McLaren 2020";
+      case 94: return "Alfa Romeo 2020";
+      case 106: return "Prema '21";
+      case 107: return "Uni-Virtuosi '21";
+      case 108: return "Carlin '21";
+      case 109: return "Hitech '21";
+      case 110: return "Art GP '21";
+      case 111: return "MP Motorsport '21";
+      case 112: return "Charouz '21";
+      case 113: return "Dams '21";
+      case 114: return "Campos '21";
+      case 115: return "BWT '21";
+      case 116: return "Trident '21";
       case 255: return "My Team";
       default: return "Default";
     }
