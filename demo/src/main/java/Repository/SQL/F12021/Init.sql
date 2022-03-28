@@ -145,6 +145,7 @@ CREATE TABLE t_participant_data_2021 (
   m_race_number NUMBER,
   m_nationality VARCHAR(100),
   m_name VARCHAR2(100),
+  m_num_active_cars NUMBER,
   CONSTRAINT t_participant_data_2021_pk PRIMARY KEY (id),
   CONSTRAINT t_participant_packet_2021_fk FOREIGN KEY (m_packet_id) REFERENCES t_packet_header_2021 (id)
 );

@@ -15,34 +15,12 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import Configuration.Configuration;
-import F12020Packet.F12020PacketMotionData;
-import F12020Packet.F12020PacketParticipantData;
-import F12020Packet.F12020PacketSessionData;
-import F12020Packet.F12020ParticipantData;
-import Repository.CarSetupDataRepository;
-import Repository.CarStatusDataRepository;
-import Repository.CarTelemetryRepository;
-import Repository.LapDataRepository;
-import Repository.MotionDataRepository;
+import F12021Packet.F12021PacketHeader;
+import MessageHandler.F12020MessageHandler;
+import MessageHandler.F12021MessageHandler;
 import Repository.OracleDataSourceProvider;
-import Repository.PacketHeaderRepository;
-import Repository.ParticipantDataRepository;
-import Repository.SessionDataRepository;
-import oracle.jdbc.pool.OracleDataSource;
-import oracle.ucp.common.waitfreepool.Pool;
+import Repository.F12021.PacketHeaderRepository2021;
 import oracle.ucp.jdbc.PoolDataSource;
-import F12020Packet.F12020CarSetupData;
-import F12020Packet.F12020CarStatusData;
-import F12020Packet.F12020CarTelemetryData;
-import F12020Packet.F12020LapData;
-import F12020Packet.F12020LobbyInfoData;
-import F12020Packet.F12020PacketCarSetupData;
-import F12020Packet.F12020PacketCarStatusData;
-import F12020Packet.F12020PacketCarTelemetryData;
-import F12020Packet.F12020PacketEventData;
-import F12020Packet.F12020PacketFinalClassificationData;
-import F12020Packet.F12020PacketHeader;
-import F12020Packet.F12020PacketLapData;
 
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -136,93 +114,36 @@ public class OCIStreaming {
   }
 
   public void processEntry(JSONObject msg, PoolDataSource pds) {
-        Gson gson = new Gson();
-        long msgOffset = msg.getLong("offset");
-        if (offset < msgOffset) {
-          offset = msgOffset;
-        }
+    Gson gson = new Gson();
+    long msgOffset = msg.getLong("offset");
+    if (offset < msgOffset) {
+      offset = msgOffset;
+    }
 
-        String value = Base64Decode(msg.getString("value"));
-        if (!value.startsWith("[")) {
-          logger.warn("Invalid message format received: " + value);
-          return;
-        }
-        JSONArray ja = new JSONArray(value);
-        if (ja.length() == 0 || !ja.get(0).toString().startsWith("{")) {
-          logger.warn("Invalid message format received: " + value);
-          return;
-        }
-        F12020PacketHeader header = gson.fromJson(ja.get(0).toString(), F12020PacketHeader.class);
-        PacketHeaderRepository prepo = new PacketHeaderRepository();
-        long id = prepo.InsertPacketHeader(header, pds);
-        if (id == 0) {
-          return;
-        }
-        switch (header.PacketId) {
-          case 0:
-            F12020PacketMotionData p = gson.fromJson(ja.get(1).toString(), F12020PacketMotionData.class);
-            MotionDataRepository mrepo = new MotionDataRepository();
-            for(int j = 0; j < p.CarMotionData.length; j++) {
-              long mdid = mrepo.InsertMotionData(id, p.CarMotionData[j], pds);
-              if (j == (int)header.PlayerCarIndex){
-                mrepo.InsertMotionDataPlayer(mdid, p, pds);
-              }
-            }
-            break;
-          case 1:
-            F12020PacketSessionData p1 = gson.fromJson(ja.get(1).toString(), F12020PacketSessionData.class);
-            SessionDataRepository repo = new SessionDataRepository();
-            repo.InsertSessionData(id, p1, pds);
-            break;
-          case 2:
-            F12020PacketLapData p2 = gson.fromJson(ja.get(1).toString(), F12020PacketLapData.class);
-            LapDataRepository repo2 = new LapDataRepository();
-            for (F12020LapData data : p2.LapData) {
-              repo2.InsertLapData(id, data, pds);
-            }
-            break;
-          case 3:
-            F12020PacketEventData p3 = gson.fromJson(ja.get(1).toString(), F12020PacketEventData.class);
-            break;
-          case 4:
-            F12020PacketParticipantData p4 = gson.fromJson(ja.get(1).toString(), F12020PacketParticipantData.class);
-            ParticipantDataRepository repo3 = new ParticipantDataRepository();
-            for (F12020ParticipantData data : p4.ParticipantData) {
-              if (data != null) {
-                repo3.InsertParticipantData(id, data, pds);
-              }
-            }
-            break;
-          case 5:
-            F12020PacketCarSetupData p5 = gson.fromJson(ja.get(1).toString(), F12020PacketCarSetupData.class);
-            CarSetupDataRepository repo4 = new CarSetupDataRepository();
-            for (F12020CarSetupData data : p5.CarSetups) {
-              repo4.InsertCarSetupData(id, data, pds);
-            }
-            break;
-          case 6:
-            F12020PacketCarTelemetryData p6 = gson.fromJson(ja.get(1).toString(), F12020PacketCarTelemetryData.class);
-            CarTelemetryRepository repo5 = new CarTelemetryRepository();
-            for (F12020CarTelemetryData data : p6.CarTelemetryData) {
-              if (data != null) {
-                repo5.InsertCarTelemetryData(id, data, pds);
-              }
-            }
-            break;
-          case 7:
-            F12020PacketCarStatusData p7 = gson.fromJson(ja.get(1).toString(), F12020PacketCarStatusData.class);
-            CarStatusDataRepository repo6 = new CarStatusDataRepository();
-            for (F12020CarStatusData data : p7.CarStatusData) {
-              repo6.InsertCarStatusData(id, data, pds);
-            }
-            break;  
-          case 8:
-            F12020PacketFinalClassificationData p8 = gson.fromJson(ja.get(1).toString(), F12020PacketFinalClassificationData.class);
-            break;
-          case 9:
-            F12020LobbyInfoData p9 = gson.fromJson(ja.get(1).toString(), F12020LobbyInfoData.class);
-            break;
-        }
+    String value = Base64Decode(msg.getString("value"));
+    if (!value.startsWith("[")) {
+      logger.warn("Invalid message format received: " + value);
+      return;
+    }
+    JSONArray ja = new JSONArray(value);
+    if (ja.length() == 0 || !ja.get(0).toString().startsWith("{")) {
+      logger.warn("Invalid message format received: " + value);
+      return;
+    }
+    F12021PacketHeader header = gson.fromJson(ja.get(0).toString(), F12021PacketHeader.class);
+    PacketHeaderRepository2021 prepo = new PacketHeaderRepository2021();
+    long id = prepo.InsertPacketHeader(header, pds);
+    if (id == 0) {
+      return;
+    }
+    if (header.PacketFormat == 2020) {
+      F12020MessageHandler msgHandler = new F12020MessageHandler();
+      msgHandler.ProcessMessage(header, id, ja, pds);
+    } else if (header.PacketFormat == 2021) {
+      F12021MessageHandler msgHandler = new F12021MessageHandler();
+      msgHandler.ProcessMessage(header, id, ja, pds);
+    }
+    
   }
 
   public static String Base64Decode(String base64Encoded) {

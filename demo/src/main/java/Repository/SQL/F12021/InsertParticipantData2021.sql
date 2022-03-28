@@ -7,7 +7,8 @@ INSERT INTO t_participant_data_2021 (
   m_team_id,
   m_race_number,
   m_nationality,
-  m_name
+  m_name,
+  m_num_active_cars
 ) VALUES (
-  ?,?,?,?,?,?,?,?,?
+  ?,?,?,?,?,?,?,?,?,?
 )

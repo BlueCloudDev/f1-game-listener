@@ -9,7 +9,6 @@ import java.sql.ResultSet;
 import Configuration.Configuration;
 import Converter.GameDataConverter2021;
 import F12021Packet.F12021LapHistoryData;
-import F12021Packet.F12021MarshalZone;
 import F12021Packet.F12021PacketSessionHistoryData;
 import F12021Packet.F12021TyreStintHistoryData;
 import oracle.ucp.jdbc.PoolDataSource;
