@@ -1,6 +1,6 @@
 INSERT INTO t_participant_data_2021 (
-  m_index,
   m_packet_id,
+  m_index,
   m_ai_controlled,
   m_driver_id,
   m_network_id,

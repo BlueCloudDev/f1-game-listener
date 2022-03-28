@@ -1,7 +1,7 @@
 package Converter;
 
 public class GameDataConverter2021 {
-  public String SessionType(short sessionType) {
+  public String SessionType(int sessionType) {
     switch (sessionType) {
       case 0: return "Unknown";
       case 1: return "P1";
@@ -20,7 +20,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String Weather(short weather) {
+  public String Weather(int weather) {
     switch (weather) { 
       case 0: return "Clear";
       case 1: return "Light Clouds";
@@ -41,7 +41,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String ZoneFlag(short zoneFlag) {
+  public String ZoneFlag(int zoneFlag) {
     switch (zoneFlag) {
       case -1: return "Invalid/Unknown";
       case 0: return "None";
@@ -53,7 +53,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String Formula(short formula) {
+  public String Formula(int formula) {
     switch (formula) {
       case 0: return "F1 Modern";
       case 1: return "F1 Classic";
@@ -63,7 +63,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String SafetyCarStatus(short safetyCarStatus) {
+  public String SafetyCarStatus(int safetyCarStatus) {
     switch (safetyCarStatus) {
       case 0: return "No Safety Car";
       case 1: return "Full Safety Car";
@@ -72,7 +72,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String NetworkGame(short networkGame) {
+  public String NetworkGame(int networkGame) {
     switch (networkGame) {
       case 0: return "Offline";
       case 1: return "Online";
@@ -80,7 +80,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String PitStatus(short pitStatus) {
+  public String PitStatus(int pitStatus) {
     switch (pitStatus) {
       case 0: return "None";
       case 1: return "Pitting";
@@ -89,7 +89,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public short Sector(short sector) {
+  public short Sector(int sector) {
     switch (sector) {
       case 0: return 1;
       case 1: return 2;
@@ -142,7 +142,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String CurrentLapValid(short currentLapValid) {
+  public String CurrentLapValid(int currentLapValid) {
     switch (currentLapValid) {
       case 0: return "Valid";
       case 1: return "Invalid";
@@ -150,7 +150,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String DriverStatus(short driverStatus) {
+  public String DriverStatus(int driverStatus) {
     switch (driverStatus) {
       case 0: return "In Garage";
       case 1: return "Flying Lap";
@@ -161,7 +161,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String ResultStatus(short resultStatus) {
+  public String ResultStatus(int resultStatus) {
     switch (resultStatus) {
       case 0: return "Invalid";
       case 1: return "Inactive";
@@ -192,7 +192,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String FuelMix(short FuelMix) {
+  public String FuelMix(int FuelMix) {
     switch (FuelMix) {
       case 0: return "Lean";
       case 1: return "Standard";
@@ -202,7 +202,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String DRSAllowed(short drsAllowed) {
+  public String DRSAllowed(int drsAllowed) {
     switch (drsAllowed) {
       case 0: return "Not Allowed";
       case 1: return "Allowed";
@@ -211,7 +211,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String ActualTypeCompound(short actualTyreCompound) {
+  public String ActualTypeCompound(int actualTyreCompound) {
     switch (actualTyreCompound) {
       case 16: return "C5";
       case 17: return "C4";
@@ -231,7 +231,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String VisualTyreCompound(short visualTyreCompound) {
+  public String VisualTyreCompound(int visualTyreCompound) {
     switch (visualTyreCompound) {
       case 16: return "Soft";
       case 17: return "Medium";
@@ -251,7 +251,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String DRSFault(short drsFault) {
+  public String DRSFault(int drsFault) {
     switch (drsFault) {
       case 0: return "OK";
       case 1: return "Fault";
@@ -334,7 +334,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String Nationality (short nationalityID) {
+  public String Nationality (int nationalityID) {
     switch (nationalityID) {
       case 1: return "American";
       case 2: return "Argentinean";
@@ -427,7 +427,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String SurfaceType(short surfaceType) {
+  public String SurfaceType(int surfaceType) {
     switch (surfaceType) {
       case 0: return "Tarmac";
       case 1: return "Rumble Strip";
@@ -445,7 +445,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String PenaltyType(short penaltyType) {
+  public String PenaltyType(int penaltyType) {
     switch (penaltyType) {
       case 0: return "Drive through";
       case 1: return "Stop Go";
@@ -469,7 +469,7 @@ public class GameDataConverter2021 {
     }
   }
 
-  public String InfringementTypes(short infringementTypes) {
+  public String InfringementTypes(int infringementTypes) {
     switch (infringementTypes) {
       case 0: return "Blocking by slow driving";
       case 1: return "Blocking by wrong way driving";
