@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLIntegrityConstraintViolationException;
 
 import Configuration.Configuration;
 import Converter.GameDataConverter2021;
@@ -45,14 +46,13 @@ public class SessionHistoryDataRepository2021 {
         if (id > 0 && sessionData.TyreStintsHistoryData.length > 0) {
           var path2 = Paths.get(SQL_FOLDER, "F12021/InsertTyreStintHistoryData2021.sql");
           String query2 = new String(Files.readAllBytes(path2.toAbsolutePath()));
-          for (F12021TyreStintHistoryData ts : sessionData.TyreStintsHistoryData) {
-            if (ts != null) {
-              try (PreparedStatement tsstmt = con.prepareStatement(query2)) {
-                tsstmt.setLong(1, id);
-                tsstmt.setString(2, gdc.ActualTypeCompound(ts.TyreActualCompound));
-                tsstmt.setString(3, gdc.VisualTyreCompound(ts.TyreVisualCompound));
-                tsstmt.execute();
-              }
+          for (int i = 0; i < sessionData.NumTyreStints; i++) {
+            try (PreparedStatement tsstmt = con.prepareStatement(query2)) {
+              tsstmt.setLong(1, id);
+              tsstmt.setString(2, gdc.ActualTypeCompound(sessionData.TyreStintsHistoryData[i].TyreActualCompound));
+              tsstmt.setString(3, gdc.VisualTyreCompound(sessionData.TyreStintsHistoryData[i].TyreVisualCompound));
+              tsstmt.setInt(4, i);
+              tsstmt.execute();
             }
           }
         }
@@ -60,21 +60,22 @@ public class SessionHistoryDataRepository2021 {
         if (id > 0 && sessionData.LapHistoryData.length > 0) {
           var path3 = Paths.get(SQL_FOLDER, "F12021/InsertLapHistoryData2021.sql");
           String query3 = new String(Files.readAllBytes(path3.toAbsolutePath()));
-          for (F12021LapHistoryData lh : sessionData.LapHistoryData) {
-            if (lh != null) {
-              try (PreparedStatement lhstmt = con.prepareStatement(query3)) {
-                lhstmt.setLong(1, id);
-                lhstmt.setLong(2, lh.LapTimeInMS);
-                lhstmt.setLong(3, lh.Sector1TimeInMS);
-                lhstmt.setLong(4, lh.Sector2TimeInMS);
-                lhstmt.setLong(5, lh.Sector3TimeInMS);
-                lhstmt.setInt(6, lh.LapValidBitFlags);
-                lhstmt.execute();
-              }
+          for (int i = 0; i < sessionData.NumLaps; i++) {
+            try (PreparedStatement lhstmt = con.prepareStatement(query3)) {
+              lhstmt.setLong(1, id);
+              lhstmt.setLong(2, sessionData.LapHistoryData[i].LapTimeInMS);
+              lhstmt.setLong(3, sessionData.LapHistoryData[i].Sector1TimeInMS);
+              lhstmt.setLong(4, sessionData.LapHistoryData[i].Sector2TimeInMS);
+              lhstmt.setLong(5, sessionData.LapHistoryData[i].Sector3TimeInMS);
+              lhstmt.setInt(6, sessionData.LapHistoryData[i].LapValidBitFlags);
+              lhstmt.setInt(7, i);
+              lhstmt.execute();
             }
           }
         }
       }
+    } catch (SQLIntegrityConstraintViolationException ex) {
+      return;
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.warn(stackTrace);

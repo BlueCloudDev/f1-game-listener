@@ -87,7 +87,7 @@ public class SessionDataRepository2021 {
         }
 
         if (id > 0 && sessionData.WeatherForecastSamples.length > 0) {
-          var path3 = Paths.get(SQL_FOLDER, "F12021/InsertWeatherForecast2021.sql");
+          var path3 = Paths.get(SQL_FOLDER, "F12021/InsertWeatherForecastSamples2021.sql");
           String query3 = new String(Files.readAllBytes(path3.toAbsolutePath()));
           for (F12021WeatherForecastSample wf : sessionData.WeatherForecastSamples) {
             if (wf != null) {

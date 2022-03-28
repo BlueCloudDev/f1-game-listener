@@ -1,6 +1,6 @@
 INSERT INTO t_packet_header_2021 (
-  m_player_name,
   m_packet_format,
+  m_player_name,
   m_game_major_version,
   m_game_minor_version,
   m_packet_version,

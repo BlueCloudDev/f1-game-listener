@@ -10,27 +10,19 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 
-import com.google.gson.Gson;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.impl.client.CloseableHttpClient;
 
-import F12020Packet.F12020PacketCarSetupData;
-import F12020Packet.F12020PacketCarStatusData;
-import F12020Packet.F12020PacketCarTelemetryData;
-import F12020Packet.F12020PacketEventData;
 import F12020Packet.F12020PacketFactory;
-import F12020Packet.F12020PacketFinalClassificationData;
 import F12020Packet.F12020PacketHeader;
-import F12020Packet.F12020PacketLapData;
-import F12020Packet.F12020PacketLobbyInfoData;
-import F12020Packet.F12020PacketMotionData;
-import F12020Packet.F12020PacketParticipantData;
-import F12020Packet.F12020PacketSessionData;
+import F12021Packet.F12021PacketFactory;
+import F12021Packet.F12021PacketHeader;
+import MessageHandler.F12020UDPPacketHandler;
+import MessageHandler.F12021UDPPacketHandler;
 import OCIStreaming.OCIStreaming;
 import OCIStreaming.OCIStreamingException;
-import OCIStreaming.OCIStreamingMessage;
 import Configuration.Configuration;
 
 import org.apache.logging.log4j.LogManager;
@@ -75,80 +67,16 @@ public class UDPListener {
   public void ReadPacket(byte[] bytes) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
     ByteBuffer bb = ByteBuffer.wrap(bytes);
     bb.order(ByteOrder.LITTLE_ENDIAN);
-    Gson gson = new Gson();
     
-    F12020PacketFactory factory = new F12020PacketFactory();
-    F12020PacketHeader header = factory.CreatePacketHeader(bb);
-    String headerJson = gson.toJson(header);
-    String body = "";
-    String payload = "";
-    OCIStreamingMessage osm = new OCIStreamingMessage();
-    String key = "F12020";
+    F12021PacketFactory factory = new F12021PacketFactory();
+    F12021PacketHeader header = factory.CreatePacketHeader(bb);
     try {
-      switch (header.PacketId) {
-        case 0:
-          F12020PacketMotionData motion = factory.CreatePacketMotionData(bb);
-          body = gson.toJson(motion);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 1:
-          F12020PacketSessionData session = factory.CreatePacksetSessionData(bb);
-          body = gson.toJson(session);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 2:
-          F12020PacketLapData lap = factory.CreatePacketLapData(bb);
-          body = gson.toJson(lap);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 3:
-          F12020PacketEventData event = factory.CreatePacketEventData(bb);
-          body = gson.toJson(event);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 4:
-          F12020PacketParticipantData participants = factory.CreatePacketParticipantData(bb);
-          body = gson.toJson(participants);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 5:
-          F12020PacketCarSetupData carsetup = factory.CreatePacketCarSetupData(bb);
-          body = gson.toJson(carsetup);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 6:
-          F12020PacketCarTelemetryData cartelemetry = factory.CreatePacketCarTelemetryData(bb);
-          body = gson.toJson(cartelemetry);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 7:
-          F12020PacketCarStatusData carstatus = factory.CreatePacketCarStatusData(bb);
-          body = gson.toJson(carstatus);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 8:
-          F12020PacketFinalClassificationData finalClassification = factory.CreatePacketFinalClassificationData(bb);
-          body = gson.toJson(finalClassification);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        case 9:
-          F12020PacketLobbyInfoData lobby = factory.CreatePacketLobbyInfoData(bb);
-          body = gson.toJson(lobby);
-          payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
-          return;
-        default:
-          System.out.println("INVALID PACKET:");
-          System.out.println(header.PacketId);
+      if(header.PacketFormat == 2020) {
+        F12020UDPPacketHandler udpHandler = new F12020UDPPacketHandler();
+        udpHandler.ReadPacket(header, bb, streaming);
+      } else if (header.PacketFormat == 2021) {
+        F12021UDPPacketHandler udpHandler = new F12021UDPPacketHandler();
+        udpHandler.ReadPacket(header, bb, streaming);
       }
     } catch (IllegalArgumentException ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);

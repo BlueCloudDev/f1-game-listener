@@ -46,17 +46,15 @@ public class ParticipantDataRepository2021 {
   public int SelectNumActiveCarsBySessionUID(String sessionUID, PoolDataSource dataSource) {
     int numActiveCars = 0;
     try (Connection con = dataSource.getConnection()) {
-      con.setAutoCommit(true);
+      con.setAutoCommit(false);
       var path = Paths.get(SQL_FOLDER, "F12021/SelectNumActiveCarsBySessionUID.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       String returnCols[] = { "t_participant_data_2021.m_num_active_cars" };
-      try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
+      try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, sessionUID);
-        if (stmt.executeUpdate() > 0) {
-          ResultSet generatedKeys = stmt.getGeneratedKeys();
-          if (null != generatedKeys && generatedKeys.next()) {
-            numActiveCars = generatedKeys.getInt(1);
-          }
+        ResultSet rs = stmt.executeQuery();
+        if(rs.next()){
+          numActiveCars = rs.getInt(1);
         }
       }
     } catch (Exception ex ) {

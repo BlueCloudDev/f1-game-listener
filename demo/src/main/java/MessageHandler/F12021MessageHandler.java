@@ -67,7 +67,7 @@ public class F12021MessageHandler {
       case 4:
         F12021PacketParticipantData p4 = gson.fromJson(ja.get(1).toString(), F12021PacketParticipantData.class);
         ParticipantDataRepository2021 repo3 = new ParticipantDataRepository2021();
-        for(int i = 0; i < numActiveCars; i++) {
+        for(int i = 0; i < p4.NumActiveCars; i++) {
           if (p4.ParticipantData[i] != null) {
             repo3.InsertParticipantData(packetHeaderId, p4.ParticipantData[i], pds, p4.NumActiveCars);
           }
@@ -110,7 +110,7 @@ public class F12021MessageHandler {
         F12021PacketCarDamageData p10 = gson.fromJson(ja.get(1).toString(), F12021PacketCarDamageData.class);
         CarDamageRepository2021 repo9 = new CarDamageRepository2021();
         for(int i = 0; i < numActiveCars; i++) {
-          repo9.InsertFinalClassification(packetHeaderId, p10.CarDamageData[i], pds);
+          repo9.InsertCarDamage(packetHeaderId, p10.CarDamageData[i], pds);
         }
       case 11:
         F12021PacketSessionHistoryData p11 = gson.fromJson(ja.get(1).toString(), F12021PacketSessionHistoryData.class);

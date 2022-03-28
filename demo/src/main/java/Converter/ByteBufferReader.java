@@ -1,5 +1,6 @@
 package Converter;
 
+import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.Charset;
 
@@ -23,8 +24,10 @@ public class ByteBufferReader {
   public long Uint32(ByteBuffer bb) {
     byte[] buf4 = { 0x00, 0x00, 0x00, 0x00 };
     bb.get(buf4);
-    ByteBuffer longBuf = ByteBuffer.wrap(buf4);
-    return longBuf.getLong();
+    ByteBuffer buffer = ByteBuffer.allocate(8).put(new byte[]{0, 0, 0, 0}).put(buf4);
+    buffer.position(0);
+
+    return buffer.getLong();
   }
 
   public int Int32(ByteBuffer bb) {
@@ -34,10 +37,12 @@ public class ByteBufferReader {
   public String Uint64(ByteBuffer bb) {
     byte[] buf8 = { 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00 };
     bb.get(buf8);
-    ByteBuffer longBuf = ByteBuffer.wrap(buf8);
-    Charset charset = Charset.defaultCharset();
+    //ByteBuffer longBuf = ByteBuffer.wrap(buf8);
+    BigInteger bigIndex = new BigInteger(buf8);
+    return bigIndex.toString();
+    /*Charset charset = Charset.defaultCharset();
     String val = charset.decode(longBuf).toString();
-    return val;
+    return val;*/
   }
 
   public float NormalizedVector(ByteBuffer bb){

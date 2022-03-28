@@ -10,15 +10,13 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import Configuration.Configuration;
-import Converter.GameDataConverter2021;
 import F12021Packet.F12021CarDamageData;
 import oracle.ucp.jdbc.PoolDataSource;
 
 public class CarDamageRepository2021 {
   private static final Logger logger = LogManager.getLogger(CarDamageRepository2021.class);
-  private GameDataConverter2021 gdc = new GameDataConverter2021();
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
-  public void InsertFinalClassification(long packetHeaderId, F12021CarDamageData carDamage, PoolDataSource dataSource) {
+  public void InsertCarDamage(long packetHeaderId, F12021CarDamageData carDamage, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "F12021/InsertCarDamageData2021.sql");
