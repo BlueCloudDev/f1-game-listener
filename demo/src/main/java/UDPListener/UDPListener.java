@@ -9,7 +9,8 @@ import java.net.SocketException;
 
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
-
+import java.util.HashMap;
+import java.util.Map;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.http.client.ClientProtocolException;
@@ -31,10 +32,10 @@ import org.apache.logging.log4j.Logger;
 public class UDPListener {
   private static final Logger logger = LogManager.getLogger(UDPListener.class);
   CloseableHttpClient httpClient;
-  private boolean stop = false;
   private int port = Integer.parseInt(Configuration.EnvVars.get("LISTEN_PORT"));
   private static int MAX_BUFFER = 2048;
   private OCIStreaming streaming;
+  
 
   public UDPListener() throws OCIStreamingException, Exception{
     super();

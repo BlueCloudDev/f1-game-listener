@@ -20,12 +20,14 @@ public class OracleDataSourceProvider {
     pds.setURL(DB_URL);
     pds.setUser(DB_USER);
     pds.setPassword(DB_PASSWORD);
-    pds.setInitialPoolSize(30);
+    pds.setConnectionPoolName("JDBC_UCP_POOL");
+    pds.setMaxPoolSize(15);
+    //pds.setInitialPoolSize(10);
 
-    Properties info = new Properties();              
-    info.put(OracleConnection.CONNECTION_PROPERTY_DEFAULT_ROW_PREFETCH, "20");   
-    info.put(OracleConnection.CONNECTION_PROPERTY_FAN_ENABLED, "false"); 
-    pds.setConnectionProperties(info);
+    //Properties info = new Properties();              
+    //info.put(OracleConnection.CONNECTION_PROPERTY_DEFAULT_ROW_PREFETCH, "20");   
+    //info.put(OracleConnection.CONNECTION_PROPERTY_FAN_ENABLED, "false"); 
+    //pds.setConnectionProperties(info);
     return pds;
   }
 }

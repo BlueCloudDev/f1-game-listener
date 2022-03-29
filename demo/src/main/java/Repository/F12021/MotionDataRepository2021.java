@@ -62,7 +62,6 @@ public class MotionDataRepository2021 {
   }
 
   public void InsertMotionDataPlayer(long carMotionDataId, F12021PacketMotionData motionData, PoolDataSource dataSource) {
-    long id = 0;
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "F12021/InsertCarMotionDataPlayer2021.sql");

@@ -9,9 +9,7 @@ import java.sql.SQLIntegrityConstraintViolationException;
 
 import Configuration.Configuration;
 import Converter.GameDataConverter2021;
-import F12021Packet.F12021LapHistoryData;
 import F12021Packet.F12021PacketSessionHistoryData;
-import F12021Packet.F12021TyreStintHistoryData;
 import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;

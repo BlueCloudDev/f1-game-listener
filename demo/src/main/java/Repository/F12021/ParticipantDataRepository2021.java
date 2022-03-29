@@ -49,7 +49,6 @@ public class ParticipantDataRepository2021 {
       con.setAutoCommit(false);
       var path = Paths.get(SQL_FOLDER, "F12021/SelectNumActiveCarsBySessionUID.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
-      String returnCols[] = { "t_participant_data_2021.m_num_active_cars" };
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, sessionUID);
         ResultSet rs = stmt.executeQuery();

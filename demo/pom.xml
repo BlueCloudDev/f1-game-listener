@@ -27,39 +27,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc8</artifactId>
-      <version>19.3.0.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.oracle.database.ha</groupId>
-          <artifactId>simplefan</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.oracle.database.ha</groupId>
-          <artifactId>ons</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-
-    <dependency>
-      <groupId>com.oracle.ojdbc</groupId>
-      <artifactId>ojdbc10</artifactId>
-      <version>19.3.0.0</version>
-      <exclusions>
-        <exclusion>
-          <groupId>com.oracle.database.ha</groupId>
-          <artifactId>simplefan</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.oracle.database.ha</groupId>
-          <artifactId>ons</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-
-    <dependency>
       <groupId>com.google.code.gson</groupId>
       <artifactId>gson</artifactId>
       <version>2.9.0</version>
@@ -136,12 +103,36 @@
       <version>2.12.1</version>
     </dependency>
   
-  
-    <dependency>
-      <groupId>com.oracle.database.jdbc</groupId>
-      <artifactId>ucp</artifactId>
-      <version>11.2.0.4</version>
+    <dependency> 
+      <groupId>com.oracle</groupId>
+      <artifactId>ojdbc10</artifactId>
+      <version>19.14.0.0</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>ucp</artifactId>
+      <version>19.14.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>oraclepki</artifactId>
+      <version>19.14.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>osdt_core</artifactId>
+      <version>19.14.0.0</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.oracle</groupId>
+      <artifactId>osdt_cert</artifactId>
+      <version>19.14.0.0</version>
+    </dependency>
+
   </dependencies>
 
   <build>
