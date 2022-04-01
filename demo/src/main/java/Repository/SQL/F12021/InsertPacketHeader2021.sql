@@ -9,8 +9,9 @@ INSERT INTO t_packet_header_2021 (
   m_session_time,
   m_frame_identifier,
   m_player_car_index,
-  m_secondary_player_car_index
+  m_secondary_player_car_index,
+  m_created_on
 ) VALUES (
   ?,?,?,?,?,?,?,?,?,?,
-  ?
+  ?,?
 )

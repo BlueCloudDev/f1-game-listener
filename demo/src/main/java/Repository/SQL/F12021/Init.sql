@@ -28,6 +28,7 @@ CREATE TABLE t_packet_header_2021 (
   m_frame_identifier NUMBER,
   m_player_car_index NUMBER,
   m_secondary_player_car_index NUMBER,
+  m_created_on TIMESTAMP,
   CONSTRAINT t_packet_header_2021_pk PRIMARY KEY (id),
   CONSTRAINT unique_packet_header_2021 UNIQUE (m_session_UID, m_packet_id, m_frame_identifier)
 );

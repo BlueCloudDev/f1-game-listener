@@ -6,6 +6,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLIntegrityConstraintViolationException;
+import java.sql.Timestamp;
+import java.time.Instant;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -37,6 +39,7 @@ public class PacketHeaderRepository2021 {
         stmt.setLong(9, packetHeader.FrameIdentifier);
         stmt.setInt(10, packetHeader.PlayerCarIndex);
         stmt.setInt(11, packetHeader.SecondaryPlayerCarIndex);
+        stmt.setTimestamp(12, Timestamp.from(Instant.now()));
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();
           if (null != generatedKeys && generatedKeys.next()) {
