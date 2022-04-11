@@ -2,6 +2,7 @@ package Converter;
 
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.nio.charset.Charset;
 
 public class ByteBufferReader {
@@ -24,7 +25,8 @@ public class ByteBufferReader {
   public long Uint32(ByteBuffer bb) {
     byte[] buf4 = { 0x00, 0x00, 0x00, 0x00 };
     bb.get(buf4);
-    ByteBuffer buffer = ByteBuffer.allocate(8).put(new byte[]{0, 0, 0, 0}).put(buf4);
+    ByteBuffer buffer = ByteBuffer.allocate(8).put(buf4).put(new byte[]{0, 0, 0, 0});
+    buffer.order(ByteOrder.LITTLE_ENDIAN);
     buffer.position(0);
 
     return buffer.getLong();
