@@ -21,7 +21,7 @@ public class FinalClassificationRepository2021 {
   public void InsertFinalClassification(long packetHeaderId, F12021FinalClassificationData finalClassification, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertFinalClassification2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021/InsertFinalClassificationData2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, packetHeaderId);

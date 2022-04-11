@@ -290,7 +290,7 @@ CREATE TABLE t_marshal_zone_2021 (
   m_zone_start NUMBER,
   m_zone_flag VARCHAR2(100),
   CONSTRAINT t_marshal_zone_2021_pk PRIMARY KEY (id),
-  CONSTRAINT t_session_data_marshal_2021_fk FOREIGN KEY (m_session_data_id) REFERENCES t_session_data (id)
+  CONSTRAINT t_session_data_marshal_2021_fk FOREIGN KEY (m_session_data_id) REFERENCES t_session_data_2021 (id)
 );
 
 
@@ -306,7 +306,7 @@ CREATE TABLE t_weather_forecast_samples_2021 (
   m_air_temperature_change VARCHAR2(100),
   m_rain_percentage NUMBER,
   CONSTRAINT t_weather_forecast_samples_2021_pk PRIMARY KEY (id),
-  CONSTRAINT t_session_data_weather_2021_fk FOREIGN KEY (m_session_data_id) REFERENCES t_session_data (id)
+  CONSTRAINT t_session_data_weather_2021_fk FOREIGN KEY (m_session_data_id) REFERENCES t_session_data_2021 (id)
 );
 
 CREATE TABLE t_final_classification_data_2021 (
