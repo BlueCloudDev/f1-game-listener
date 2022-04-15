@@ -3,6 +3,9 @@ package F12021Packet;
 
 
 public class F12021PacketSessionData {
+  public int SessionLookupID;
+  public Float SessionTime;
+  public Long FrameIdentifier;
   /**
    * Weather - 0 = clear, 1 = light cloud, 2 = overcast
    * 3 = light rain, 4 = heavy rain, 5 = storm                             

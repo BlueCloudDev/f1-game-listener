@@ -29,6 +29,7 @@ public class SessionHistoryDataRepository2021 {
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
         stmt.setString(1, sessionUID);
         stmt.setInt(2, sessionData.Index);
+        stmt.setInt(3, sessionData.SessionLookupID);
         stmt.setInt(3, sessionData.BestLapTimeLapNum);
         stmt.setInt(4, sessionData.BestSector1LapNum);
         stmt.setInt(5, sessionData.BestSector2LapNum);

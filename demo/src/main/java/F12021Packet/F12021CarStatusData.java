@@ -5,6 +5,9 @@ public class F12021CarStatusData {
    * Index of car status data in array
    */
   public int Index;
+  public Long FrameIdentifier;
+  public float SessionTime;
+  public int SessionLookupID;
   /**
    * 0 (off) - 2 (high)
    */

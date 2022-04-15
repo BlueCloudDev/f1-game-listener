@@ -1,6 +1,9 @@
 INSERT INTO t_lap_data_2021 (
   m_index,
   m_packet_id,
+  m_session_lookup_id,
+  m_session_time,
+  m_frame_identifier,
   m_last_lap_time_in_ms,
   m_current_lap_time_in_ms,
   m_sector_1_time_in_ms,
@@ -28,5 +31,5 @@ INSERT INTO t_lap_data_2021 (
 ) VALUES (
   ?,?,?,?,?,?,?,?,?,?,
   ?,?,?,?,?,?,?,?,?,?,
-  ?,?,?,?,?,?
+  ?,?,?,?,?,?,?,?,?
 )

@@ -5,6 +5,9 @@ public class F12021CarTelemetryData {
    * Index of car in array
    */
   public int Index;
+  public Long FrameIdentifier;
+  public float SessionTime;
+  public int SessionLookupID;
   /**
    * Speed of car in kilometres per hour
    */

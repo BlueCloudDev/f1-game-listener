@@ -1,6 +1,9 @@
 INSERT INTO t_car_setup_data_2021 (
   m_packet_id,
   m_index,
+  m_session_lookup_id,
+  m_session_time,
+  m_frame_identifier,
   m_front_wing,
   m_rear_wing,
   m_on_throttle,
@@ -26,5 +29,5 @@ INSERT INTO t_car_setup_data_2021 (
 ) VALUES (
   ?,?,?,?,?,?,?,?,?,?,
   ?,?,?,?,?,?,?,?,?,?,
-  ?,?,?,?
+  ?,?,?,?,?,?,?
 )

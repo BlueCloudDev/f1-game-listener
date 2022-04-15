@@ -277,6 +277,7 @@ public class F12021PacketFactory {
     p.Nationality = reader.Uint8(bb);
     p.Name = getName(bb);
     p.YourTelemetry = reader.Uint8(bb);
+
     return p;
   }
 

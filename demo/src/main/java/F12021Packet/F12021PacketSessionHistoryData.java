@@ -5,6 +5,7 @@ public class F12021PacketSessionHistoryData {
    * car index
    */
   public int Index;
+  public int SessionLookupID;
   /**
    * Number of laps in the data (including current partial lap)
    */

@@ -29,23 +29,26 @@ public class MotionDataRepository2021 {
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
         stmt.setLong(1, packetHeaderID);
         stmt.setInt(2, motionData.Index);
-        stmt.setFloat(3, motionData.WorldPositionX);
-        stmt.setFloat(4, motionData.WorldPositionY);
-        stmt.setFloat(5, motionData.WorldPositionZ);
-        stmt.setFloat(6, motionData.WorldVelocityX);
-        stmt.setFloat(7, motionData.WorldVelocityY);
-        stmt.setFloat(8, motionData.WorldVelocityZ);
-        stmt.setFloat(9, motionData.WorldForwardDirX);
-        stmt.setFloat(10, motionData.WorldForwardDirY);
-        stmt.setFloat(11, motionData.WorldForwardDirZ);
-        stmt.setFloat(12, motionData.WorldRightDirX);
-        stmt.setFloat(13, motionData.WorldRightDirY);
-        stmt.setFloat(14, motionData.WorldRightDirZ);
-        stmt.setFloat(15, motionData.GForceLateral);
-        stmt.setFloat(16, motionData.GForceLongitudinal);
-        stmt.setFloat(17, motionData.Yaw);
-        stmt.setFloat(18, motionData.Pitch);
-        stmt.setFloat(19, motionData.Roll);
+        stmt.setInt(3, motionData.SessionLookupID);
+        stmt.setFloat(4, motionData.SessionTime);
+        stmt.setLong(5, motionData.FrameIdentifier);
+        stmt.setFloat(6, motionData.WorldPositionX);
+        stmt.setFloat(7, motionData.WorldPositionY);
+        stmt.setFloat(8, motionData.WorldPositionZ);
+        stmt.setFloat(9, motionData.WorldVelocityX);
+        stmt.setFloat(10, motionData.WorldVelocityY);
+        stmt.setFloat(11, motionData.WorldVelocityZ);
+        stmt.setFloat(12, motionData.WorldForwardDirX);
+        stmt.setFloat(13, motionData.WorldForwardDirY);
+        stmt.setFloat(14, motionData.WorldForwardDirZ);
+        stmt.setFloat(15, motionData.WorldRightDirX);
+        stmt.setFloat(16, motionData.WorldRightDirY);
+        stmt.setFloat(17, motionData.WorldRightDirZ);
+        stmt.setFloat(18, motionData.GForceLateral);
+        stmt.setFloat(19, motionData.GForceLongitudinal);
+        stmt.setFloat(20, motionData.Yaw);
+        stmt.setFloat(21, motionData.Pitch);
+        stmt.setFloat(22, motionData.Roll);
         
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();

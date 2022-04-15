@@ -5,6 +5,9 @@ public class F12021LapData {
    * Index of the lap data in packet array
    */
   public int Index;
+  public Long FrameIdentifier;
+  public float SessionTime;
+  public int SessionLookupID;
   /**
    * Last lap time in seconds                               
    */

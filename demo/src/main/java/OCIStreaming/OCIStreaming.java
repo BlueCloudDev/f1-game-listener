@@ -18,7 +18,7 @@ import Configuration.Configuration;
 import F12021Packet.F12021PacketHeader;
 import MessageHandler.F12020MessageHandler;
 import MessageHandler.F12021MessageHandler;
-import Repository.OracleDataSourceProvider;
+import Repository.F12020.OracleDataSourceProvider;
 import Repository.F12021.PacketHeaderRepository2021;
 import oracle.ucp.jdbc.PoolDataSource;
 

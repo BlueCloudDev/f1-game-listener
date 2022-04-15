@@ -9,6 +9,7 @@ import Repository.F12021.MotionDataRepository2021;
 import Repository.F12021.ParticipantDataRepository2021;
 import Repository.F12021.SessionDataRepository2021;
 import Repository.F12021.SessionHistoryDataRepository2021;
+import Repository.F12021.SessionLookupRepository2021;
 import oracle.ucp.jdbc.PoolDataSource;
 import F12021Packet.F12021PacketCarDamageData;
 import F12021Packet.F12021PacketCarSetupData;
@@ -21,6 +22,8 @@ import F12021Packet.F12021PacketMotionData;
 import F12021Packet.F12021PacketParticipantData;
 import F12021Packet.F12021PacketSessionData;
 import F12021Packet.F12021PacketSessionHistoryData;
+import F12021Packet.F12021SessionLookup;
+
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -29,12 +32,19 @@ import org.json.JSONArray;
 public class F12021MessageHandler {
   public void ProcessMessage(F12021PacketHeader header, long packetHeaderId, JSONArray ja, PoolDataSource pds) {
     Gson gson = new Gson();
-    ParticipantDataRepository2021 participantRepo = new ParticipantDataRepository2021();
+    F12021SessionLookup lookup = new F12021SessionLookup();
+    lookup.PlayerName = header.PlayerName;
+    lookup.SessionUID = header.SessionUID;
+    SessionLookupRepository2021 lkrepo = new SessionLookupRepository2021();
+    lookup.Id = lkrepo.InsertSessionLookup(lookup, pds);
     switch (header.PacketId) {
       case 0:
         F12021PacketMotionData p = gson.fromJson(ja.get(1).toString(), F12021PacketMotionData.class);
         MotionDataRepository2021 mrepo = new MotionDataRepository2021();
         for(int i = 0; i < p.CarMotionData.length; i++) {
+          p.CarMotionData[i].SessionLookupID = lookup.Id;
+          p.CarMotionData[i].FrameIdentifier = header.FrameIdentifier;
+          p.CarMotionData[i].SessionTime = header.SessionTime;
           long mdid = mrepo.InsertMotionData(packetHeaderId, p.CarMotionData[i], pds);
           if (i == (int)header.PlayerCarIndex){
             mrepo.InsertMotionDataPlayer(mdid, p, pds);
@@ -51,6 +61,9 @@ public class F12021MessageHandler {
         LapDataRepository2021 repo2 = new LapDataRepository2021();
         for(int i = 0; i < p2.LapData.length; i++) {
           if (p2.LapData[i] != null) {
+            p2.LapData[i].SessionLookupID = lookup.Id;
+            p2.LapData[i].FrameIdentifier = header.FrameIdentifier;
+            p2.LapData[i].SessionTime = header.SessionTime;
             repo2.InsertLapData(packetHeaderId, p2.LapData[i], pds);
           }
         }
@@ -63,6 +76,9 @@ public class F12021MessageHandler {
         ParticipantDataRepository2021 repo3 = new ParticipantDataRepository2021();
         for(int i = 0; i < p4.NumActiveCars; i++) {
           if (p4.ParticipantData[i] != null) {
+            p4.ParticipantData[i].SessionLookupID = lookup.Id;
+            p4.ParticipantData[i].FrameIdentifier = header.FrameIdentifier;
+            p4.ParticipantData[i].SessionTime = header.SessionTime;
             repo3.InsertParticipantData(packetHeaderId, p4.ParticipantData[i], pds, p4.NumActiveCars);
           }
         }
@@ -72,6 +88,9 @@ public class F12021MessageHandler {
         CarSetupDataRepository2021 repo4 = new CarSetupDataRepository2021();
         for(int i = 0; i < p5.CarSetups.length; i++) {
           if (p5.CarSetups[i] != null) {
+            p5.CarSetups[i].SessionLookupID = lookup.Id;
+            p5.CarSetups[i].FrameIdentifier = header.FrameIdentifier;
+            p5.CarSetups[i].SessionTime = header.SessionTime;
             repo4.InsertCarSetupData(packetHeaderId, p5.CarSetups[i], pds);
           }
         }
@@ -81,6 +100,9 @@ public class F12021MessageHandler {
         CarTelemetryRepository2021 repo5 = new CarTelemetryRepository2021();
         for(int i = 0; i < p6.CarTelemetryData.length; i++) {
           if (p6.CarTelemetryData[i] != null) {
+            p6.CarTelemetryData[i].SessionLookupID = lookup.Id;
+            p6.CarTelemetryData[i].FrameIdentifier = header.FrameIdentifier;
+            p6.CarTelemetryData[i].SessionTime = header.SessionTime;
             repo5.InsertCarTelemetryData(packetHeaderId, p6.CarTelemetryData[i], pds);
           }
         }
@@ -90,6 +112,9 @@ public class F12021MessageHandler {
         CarStatusDataRepository2021 repo6 = new CarStatusDataRepository2021();
         for(int i = 0; i < p7.CarStatusData.length; i++) {
           if (p7.CarStatusData[i] != null) {
+            p7.CarStatusData[i].SessionLookupID = lookup.Id;
+            p7.CarStatusData[i].FrameIdentifier = header.FrameIdentifier;
+            p7.CarStatusData[i].SessionTime = header.SessionTime;
             repo6.InsertCarStatusData(packetHeaderId, p7.CarStatusData[i], pds);
           }
         }
@@ -99,6 +124,9 @@ public class F12021MessageHandler {
         FinalClassificationRepository2021 repo7 = new FinalClassificationRepository2021();
         for(int i = 0; i < p8.ClassificationData.length; i++) {
           if (p8.ClassificationData[i] != null) {
+            p8.ClassificationData[i].SessionLookupID = lookup.Id;
+            p8.ClassificationData[i].FrameIdentifier = header.FrameIdentifier;
+            p8.ClassificationData[i].SessionTime = header.SessionTime;
             repo7.InsertFinalClassification(packetHeaderId, p8.ClassificationData[i], pds);
           }
         }
@@ -111,6 +139,9 @@ public class F12021MessageHandler {
         CarDamageRepository2021 repo9 = new CarDamageRepository2021();
         for(int i = 0; i < p10.CarDamageData.length; i++) {
           if (p10.CarDamageData != null) {
+            p10.CarDamageData[i].SessionLookupID = lookup.Id;
+            p10.CarDamageData[i].FrameIdentifier = header.FrameIdentifier;
+            p10.CarDamageData[i].SessionTime = header.SessionTime;
             repo9.InsertCarDamage(packetHeaderId, p10.CarDamageData[i], pds);
           }
         }

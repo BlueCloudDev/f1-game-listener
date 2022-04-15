@@ -19,13 +19,13 @@ import F12020Packet.F12020PacketParticipantData;
 import F12020Packet.F12020PacketSessionData;
 import F12020Packet.F12020ParticipantData;
 import F12021Packet.F12021PacketHeader;
-import Repository.CarSetupDataRepository;
-import Repository.CarStatusDataRepository;
-import Repository.CarTelemetryRepository;
-import Repository.LapDataRepository;
-import Repository.MotionDataRepository;
-import Repository.ParticipantDataRepository;
-import Repository.SessionDataRepository;
+import Repository.F12020.CarSetupDataRepository;
+import Repository.F12020.CarStatusDataRepository;
+import Repository.F12020.CarTelemetryRepository;
+import Repository.F12020.LapDataRepository;
+import Repository.F12020.MotionDataRepository;
+import Repository.F12020.ParticipantDataRepository;
+import Repository.F12020.SessionDataRepository;
 import oracle.ucp.jdbc.PoolDataSource;
 
 public class F12020MessageHandler {
