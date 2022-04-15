@@ -35,6 +35,7 @@ public class F12021MessageHandler {
     F12021SessionLookup lookup = new F12021SessionLookup();
     lookup.PlayerName = header.PlayerName;
     lookup.SessionUID = header.SessionUID;
+    lookup.PlayerCarIndex = header.PlayerCarIndex;
     SessionLookupRepository2021 lkrepo = new SessionLookupRepository2021();
     lookup.Id = lkrepo.InsertSessionLookup(lookup, pds);
     switch (header.PacketId) {
