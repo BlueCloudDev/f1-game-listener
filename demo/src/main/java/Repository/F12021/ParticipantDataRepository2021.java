@@ -28,16 +28,14 @@ public class ParticipantDataRepository2021 {
         stmt.setLong(1, packetHeaderID);
         stmt.setInt(2, participantData.Index);
         stmt.setInt(3, participantData.SessionLookupID);
-        stmt.setFloat(4, participantData.SessionTime);
-        stmt.setLong(5, participantData.FrameIdentifier);
-        stmt.setInt(6, participantData.AiControlled);
-        stmt.setString(7, gdc.DriverId(participantData.DriverId));
-        stmt.setInt(8, participantData.NetworkId);
-        stmt.setString(9, gdc.Team(participantData.TeamId));
-        stmt.setInt(10, participantData.RaceNumber);
-        stmt.setString(11, gdc.Nationality(participantData.Nationality));
-        stmt.setString(12, participantData.Name);
-        stmt.setInt(13, numActiveCars);
+        stmt.setInt(4, participantData.AiControlled);
+        stmt.setString(5, gdc.DriverId(participantData.DriverId));
+        stmt.setInt(6, participantData.NetworkId);
+        stmt.setString(7, gdc.Team(participantData.TeamId));
+        stmt.setInt(8, participantData.RaceNumber);
+        stmt.setString(9, gdc.Nationality(participantData.Nationality));
+        stmt.setString(10, participantData.Name);
+        stmt.setInt(11, numActiveCars);
         stmt.executeUpdate();
       }
     } catch (Exception ex) {

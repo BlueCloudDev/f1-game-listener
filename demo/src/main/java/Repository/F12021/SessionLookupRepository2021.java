@@ -30,7 +30,10 @@ public class SessionLookupRepository2021 {
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
         stmt.setString(1, lookup.PlayerName);
         stmt.setString(2, lookup.SessionUID);
-        stmt.setTimestamp(3, Timestamp.from(Instant.now()));
+        stmt.setLong(3, lookup.FrameIdentifier);
+        stmt.setFloat(4, lookup.SessionTime);
+        stmt.setTimestamp(5, Timestamp.from(Instant.now()));
+        stmt.setInt(6, lookup.PlayerCarIndex);
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();
           if (null != generatedKeys && generatedKeys.next()) {
@@ -56,6 +59,27 @@ public class SessionLookupRepository2021 {
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, sessionUID);
+        ResultSet rs = stmt.executeQuery();
+        if(rs.next()){
+          id = rs.getInt(1);
+        }
+      }
+    } catch (Exception ex ) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
+    }
+    return id;
+  }
+
+  public int SelectSessionLookupIDBySessionUIDAndFrameIdentifier(String sessionUID, long frameIdentifier, PoolDataSource dataSource) {
+    int id = 0;
+    try (Connection con = dataSource.getConnection()) {
+      con.setAutoCommit(false);
+      var path = Paths.get(SQL_FOLDER, "F12021/SelectSessionLookupIDBySessionUIDandFrameIdentifier2021.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
+      try (PreparedStatement stmt = con.prepareStatement(query)) {
+        stmt.setString(1, sessionUID);
+        stmt.setLong(2, frameIdentifier);
         ResultSet rs = stmt.executeQuery();
         if(rs.next()){
           id = rs.getInt(1);

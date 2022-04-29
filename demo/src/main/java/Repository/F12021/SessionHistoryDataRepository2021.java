@@ -30,10 +30,10 @@ public class SessionHistoryDataRepository2021 {
         stmt.setString(1, sessionUID);
         stmt.setInt(2, sessionData.Index);
         stmt.setInt(3, sessionData.SessionLookupID);
-        stmt.setInt(3, sessionData.BestLapTimeLapNum);
-        stmt.setInt(4, sessionData.BestSector1LapNum);
-        stmt.setInt(5, sessionData.BestSector2LapNum);
-        stmt.setInt(6, sessionData.BestSector3LapNum);
+        stmt.setInt(4, sessionData.BestLapTimeLapNum);
+        stmt.setInt(5, sessionData.BestSector1LapNum);
+        stmt.setInt(6, sessionData.BestSector2LapNum);
+        stmt.setInt(7, sessionData.BestSector3LapNum);
         long id = 0;
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();

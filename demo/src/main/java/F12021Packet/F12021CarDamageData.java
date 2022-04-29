@@ -5,8 +5,6 @@ public class F12021CarDamageData {
    * Index of the car
    */
   public int Index;
-  public Long FrameIdentifier;
-  public float SessionTime;
   public int SessionLookupID;
   /**
    * Tyre Wear (percentage)

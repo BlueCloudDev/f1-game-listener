@@ -1,8 +1,6 @@
 package F12021Packet;
 
 public class F12021FinalClassificationData {
-  public Long FrameIdentifier;
-  public float SessionTime;
   public int SessionLookupID;
   public int Position;
   public int NumLaps;

@@ -1,7 +1,10 @@
 INSERT INTO t_session_lookup_2021 (
   m_player_name,
   m_session_UID,
-  m_created_on
+  m_frame_identifier,
+  m_session_time,
+  m_created_on,
+  m_player_car_index
 ) VALUES (
-  ?,?,?
+  ?,?,?,?,?,?
 )

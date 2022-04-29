@@ -5,8 +5,6 @@ public class F12021CarMotionData {
    * Index of car motion data in array
    */
   public int Index;
-  public Long FrameIdentifier;
-  public float SessionTime;
   public int SessionLookupID;
   /**
    * World space X position

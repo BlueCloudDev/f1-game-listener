@@ -5,8 +5,6 @@ public class F12021ParticipantData {
    * Index of participant in array
    */
   public int Index;
-  public Long FrameIdentifier;
-  public float SessionTime;
   public int SessionLookupID;
   /**
    * Whether the vehicle is AI (1) or Human (0) controlled
