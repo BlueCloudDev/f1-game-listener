@@ -11,6 +11,8 @@ import Configuration.Configuration;
 import OCIStreaming.OCIStreaming;
 import UDPListener.UDPListener;
 
+import com.hellokaton.blade.Blade;
+
 
 public class App {
   private static final Logger logger = LogManager.getLogger(App.class);
@@ -26,6 +28,10 @@ public class App {
     String APPLICATION_MODE = Configuration.EnvVars.get("APPLICATION_MODE").toLowerCase();
     logger.info("Application Mode: " + APPLICATION_MODE);
 
+    if(APPLICATION_MODE.equals("api")) {
+      Blade.create().start(App.class, args);
+    }
+
     if (APPLICATION_MODE.equals("both") || APPLICATION_MODE.equals("consumer")) {
       Timer timer = new Timer();
       TimerTask getMsgTask = GetMessagesTask();
@@ -33,7 +39,7 @@ public class App {
       logger.info("Started consumer task");
     }
     
-    if (APPLICATION_MODE.equals("both") || APPLICATION_MODE.equals("listener")) {
+    if (APPLICATION_MODE.equals("both") || APPLICATION_MODE.equals("listener") || APPLICATION_MODE.equals("local-listener")) {
       try {
         logger.info("Started listener");
         UDPListener listener = new UDPListener();

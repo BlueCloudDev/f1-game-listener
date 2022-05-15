@@ -7,6 +7,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 public class OCIStreamingMessage {
+  //TODO: change this so that you can make an array of messages and add to them instead of this nonsense
   public String Build(String key, String headerJson, String body) throws UnsupportedEncodingException {
     JSONArray ja = new JSONArray();
     ja.put(0, headerJson);

@@ -19,7 +19,7 @@ public class Configuration {
     "FINGERPRINT", 
     "TENANCY_OCID", 
     "USER_OCID",
-    "API_HOST"
+    "API_HOST",
   };
   private final String[] consumerKeys = {
     "SQL_FOLDER",
@@ -30,6 +30,12 @@ public class Configuration {
   private final String[] listenerKeys = {
     "LISTEN_PORT",
     "PLAYER_NAME"
+  };
+  private final String[] localListenerKeys = {
+    "LISTEN_PORT",
+    "PLAYER_NAME",
+    "API_IP",
+    "API_PORT"
   };
   public boolean ReadEnvVars() {
     Map <String, String> envVarMap = System.getenv();
@@ -54,6 +60,16 @@ public class Configuration {
 
     if (missingKeys.size() == 0 && (EnvVars.get("APPLICATION_MODE").toLowerCase().equals("listener") || EnvVars.get("APPLICATION_MODE").toLowerCase().equals("both"))) {
       for (String key : listenerKeys) {
+        if(envVarMap.containsKey(key) && envVarMap.get(key) != "") {
+          EnvVars.put(key, envVarMap.get(key));
+        } else {
+          missingKeys.add(key);
+        }
+      }
+    }
+
+    if (missingKeys.size() == 0 && (EnvVars.get("APPLICATION_MODE").toLowerCase().equals("local-listener"))) {
+      for (String key : localListenerKeys) {
         if(envVarMap.containsKey(key) && envVarMap.get(key) != "") {
           EnvVars.put(key, envVarMap.get(key));
         } else {

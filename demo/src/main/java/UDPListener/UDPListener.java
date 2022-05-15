@@ -34,14 +34,6 @@ public class UDPListener {
   CloseableHttpClient httpClient;
   private int port = Integer.parseInt(Configuration.EnvVars.get("LISTEN_PORT"));
   private static int MAX_BUFFER = 2048;
-  private OCIStreaming streaming;
-  
-
-  public UDPListener() throws OCIStreamingException, Exception{
-    super();
-    streaming = new OCIStreaming();
-
-  }
 
   public void Listen() throws SocketException, IOException, Exception {
     DatagramSocket socket = new DatagramSocket(port);
@@ -73,11 +65,18 @@ public class UDPListener {
     F12021PacketHeader header = factory.CreatePacketHeader(bb);
     try {
       if(header.PacketFormat == 2020) {
-        F12020UDPPacketHandler udpHandler = new F12020UDPPacketHandler();
-        udpHandler.ReadPacket(header, bb, streaming);
+        logger.fatal("2020 not supported at the moment");
+        //F12020UDPPacketHandler udpHandler = new F12020UDPPacketHandler();
+        //udpHandler.ReadPacket(header, bb, streaming);
       } else if (header.PacketFormat == 2021) {
-        F12021UDPPacketHandler udpHandler = new F12021UDPPacketHandler();
-        udpHandler.ReadPacket(header, bb, streaming);
+        String APPLICATION_MODE = Configuration.EnvVars.get("APPLICATION_MODE").toLowerCase();
+        if (APPLICATION_MODE.equals("listener")) {
+          F12021UDPPacketHandler udpHandler = new F12021UDPPacketHandler(false);
+          udpHandler.ReadPacket(header, bb);
+        } else if (APPLICATION_MODE.equals("local-listener")) {
+          F12021UDPPacketHandler udpHandler = new F12021UDPPacketHandler(true);
+          udpHandler.ReadPacket(header, bb);
+        }
       }
     } catch (IllegalArgumentException ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);

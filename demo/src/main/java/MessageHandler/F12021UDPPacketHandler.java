@@ -1,17 +1,27 @@
 package MessageHandler;
 
+import java.io.DataOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.google.gson.Gson;
 
+import org.apache.catalina.webresources.Cache;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.apache.commons.lang3.time.StopWatch;
 import org.apache.http.client.ClientProtocolException;
 
 import OCIStreaming.OCIStreaming;
+import OCIStreaming.OCIStreamingException;
 import OCIStreaming.OCIStreamingMessage;
 import Repository.F12021.SessionLookupRepository2021;
 import oracle.security.crypto.cert.TrustedCAPolicy;
@@ -19,7 +29,6 @@ import oracle.security.crypto.cert.TrustedCAPolicy;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import F12020Packet.F12020PacketHeader;
 import F12021Packet.F12021CarDamageData;
 import F12021Packet.F12021CarMotionData;
 import F12021Packet.F12021CarSetupData;
@@ -39,13 +48,77 @@ import F12021Packet.F12021PacketMotionData;
 import F12021Packet.F12021PacketParticipantData;
 import F12021Packet.F12021PacketSessionData;
 import F12021Packet.F12021PacketSessionHistoryData;
-import F12021Packet.F12021SessionLookup;
+
+import Configuration.Configuration;
 
 public class F12021UDPPacketHandler {
   private static final Logger logger = LogManager.getLogger(F12020UDPPacketHandler.class);
   private static Map<String, Integer> sessionParticipants = new HashMap<String, Integer>();
+  private static ArrayList<String> messageCache = new ArrayList<String>();
+  private static StopWatch stopwatch = new StopWatch();
+  private static OCIStreaming streaming = null;
+  private Boolean isCached;
 
-  public void ReadPacket(F12021PacketHeader header, ByteBuffer bb, OCIStreaming streaming) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
+  public F12021UDPPacketHandler(Boolean _isCached) throws OCIStreamingException, Exception {
+    super();
+    isCached = _isCached;
+    if (!isCached && streaming == null) {
+      streaming = new OCIStreaming();
+    }
+    if (stopwatch.isStopped()) {
+      stopwatch.start();
+    }
+  }
+
+  public void ProcessMessage(String payload) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
+    if (!isCached) {
+      streaming.SendMessage(payload);
+    } else {
+      messageCache.add(payload);
+    }
+  }
+
+  public synchronized void sendCache() throws MalformedURLException, IOException {
+    Gson gson = new Gson();
+    String body = gson.toJson(messageCache);
+
+    URL url = new URL("http://" + Configuration.EnvVars.get("API_IP") + ":" + Configuration.EnvVars.get("API_PORT") + "/f12021");
+    HttpURLConnection con = (HttpURLConnection) url.openConnection();
+    con.setRequestMethod("POST");
+    con.setRequestProperty("Content-Type", "application/json");
+    //TODO add an API key for security
+    /*if (apikey.equals(Constants.APIKEY_PREPROD)) {
+        connection.setRequestProperty("Authorization", Constants.APIKEY_PREPROD);
+    }
+    if (apikey.equals(Constants.APIKEY_PROD)){
+        connection.setRequestProperty("Authorization", Constants.APIKEY_PROD);
+    }*/
+    con.setRequestProperty("Content-Length", Integer.toString(body.getBytes().length));
+    con.setRequestProperty("Content-Language", "en-US");  
+    con.setUseCaches(false);
+    con.setDoOutput(true);
+
+    //Send request
+    OutputStream os = con.getOutputStream();
+    os.write(body.getBytes("UTF-8"));
+    os.close();
+    int res = con.getResponseCode();
+    if (res != 200) {
+      logger.info("Error sending message to API: " + res);
+      return;
+    }
+
+    String msg = "Sending cached messages: " + messageCache.size() + " count";
+    logger.info(msg);
+    messageCache.clear();
+    stopwatch.reset();
+  }
+
+  public void ReadPacket(F12021PacketHeader header, ByteBuffer bb) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
+    long elapsed = stopwatch.getTime(TimeUnit.MILLISECONDS);
+    if (elapsed > 5000) {
+      sendCache();
+    }
     String body = "";
     Gson gson = new Gson();
     OCIStreamingMessage osm = new OCIStreamingMessage();
@@ -72,13 +145,13 @@ public class F12021UDPPacketHandler {
           motion.CarMotionData = trunc;
           body = gson.toJson(motion);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 1:
           F12021PacketSessionData session = factory.CreatePacksetSessionData(bb);
           body = gson.toJson(session);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 2:
           F12021PacketLapData lap = factory.CreatePacketLapData(bb);
@@ -96,20 +169,20 @@ public class F12021UDPPacketHandler {
           lap.LapData = trunc1;
           body = gson.toJson(lap);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 3:
           F12021PacketEventData event = factory.CreatePacketEventData(bb);
           body = gson.toJson(event);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 4:
           F12021PacketParticipantData participants = factory.CreatePacketParticipantData(bb);
           sessionParticipants.put(header.SessionUID, participants.NumActiveCars);
           body = gson.toJson(participants);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 5:
           F12021PacketCarSetupData carsetup = factory.CreatePacketCarSetupData(bb);
@@ -127,7 +200,7 @@ public class F12021UDPPacketHandler {
           carsetup.CarSetups = trunc2;
           body = gson.toJson(carsetup);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 6:
           F12021PacketCarTelemetryData cartelemetry = factory.CreatePacketCarTelemetryData(bb);
@@ -145,7 +218,7 @@ public class F12021UDPPacketHandler {
           cartelemetry.CarTelemetryData = trunc3;
           body = gson.toJson(cartelemetry);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 7:
           F12021PacketCarStatusData carstatus = factory.CreatePacketCarStatusData(bb);
@@ -163,13 +236,13 @@ public class F12021UDPPacketHandler {
           body = gson.toJson(carstatus);
           carstatus.CarStatusData = trunc4;
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 8:
           F12021PacketFinalClassificationData finalClassification = factory.CreatePacketFinalClassificationData(bb);
           body = gson.toJson(finalClassification);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 9:
           return;
@@ -189,13 +262,13 @@ public class F12021UDPPacketHandler {
           carDamage.CarDamageData = trunc5;
           body = gson.toJson(carDamage);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         case 11:
           F12021PacketSessionHistoryData sessionHistoryData = factory.CreatePacketSessionHistoryData(bb);
           body = gson.toJson(sessionHistoryData);
           payload = osm.Build(key, headerJson, body);
-          streaming.SendMessage(payload);
+          ProcessMessage(payload);
           return;
         default:
           System.out.println("INVALID PACKET:");
