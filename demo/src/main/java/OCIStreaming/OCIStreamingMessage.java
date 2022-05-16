@@ -4,22 +4,18 @@ import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 
 import org.json.JSONArray;
-import org.json.JSONObject;
 
 public class OCIStreamingMessage {
-  //TODO: change this so that you can make an array of messages and add to them instead of this nonsense
-  public String Build(String key, String headerJson, String body) throws UnsupportedEncodingException {
+  public String key;
+  public String value;
+
+  public OCIStreamingMessage(String _key, String packetHeaderJson, String bodyJson) throws UnsupportedEncodingException {
+    super();
     JSONArray ja = new JSONArray();
-    ja.put(0, headerJson);
-    ja.put(1, body);
-    JSONObject payload = new JSONObject();
-    JSONArray msgs = new JSONArray();
-    JSONObject msg = new JSONObject();
-    msg.put("key", Base64.getEncoder().encodeToString(key.getBytes("UTF-8")));
-    String enc = Base64.getEncoder().encodeToString(ja.toString().getBytes("UTF-8"));
-    msg.put("value", enc);
-    msgs.put(msg);
-    payload.put("messages", msgs);
-    return payload.toString();
+    ja.put(0, packetHeaderJson);
+    ja.put(1, bodyJson);
+    key = Base64.getEncoder().encodeToString(_key.getBytes("UTF-8"));
+    value = Base64.getEncoder().encodeToString(ja.toString().getBytes("UTF-8"));
   }
+
 }

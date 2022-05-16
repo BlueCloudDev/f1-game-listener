@@ -33,12 +33,12 @@ public class F12020UDPPacketHandler {
   public void ReadPacket(F12021PacketHeader header, ByteBuffer bb, OCIStreaming streaming) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
     String body = "";
     Gson gson = new Gson();
-    OCIStreamingMessage osm = new OCIStreamingMessage();
+    //OCIStreamingMessage osm = new OCIStreamingMessage();
     String key = "F12020";
     String headerJson = gson.toJson(header);
     String payload = "";
     F12020PacketFactory factory = new F12020PacketFactory();
-    try {
+    /*try {
       switch (header.PacketId) {
         case 0:
           F12020PacketMotionData motion = factory.CreatePacketMotionData(bb);
@@ -107,6 +107,6 @@ public class F12020UDPPacketHandler {
     } catch (IllegalArgumentException ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.fatal(stackTrace);
-    }
+    }*/
   }
 }

@@ -81,6 +81,8 @@ public class OCIStreaming {
     if (req != null) {
       try (CloseableHttpResponse response = httpClient.execute(req)) {
         EntityUtils.consumeQuietly(response.getEntity());
+        var string = response.getStatusLine();
+        System.out.println(string);
       }
     }
   }
