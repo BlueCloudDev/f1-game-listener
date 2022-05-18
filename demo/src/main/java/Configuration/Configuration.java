@@ -37,6 +37,13 @@ public class Configuration {
     "API_IP",
     "API_PORT"
   };
+  private final String[] localServerKeys = {
+    "LISTEN_PORT",
+    "PLAYER_NAME",
+    "API_IP",
+    "API_PORT",
+    "SQL_FOLDER"
+  };
   public boolean ReadEnvVars() {
     Map <String, String> envVarMap = System.getenv();
     List<String> missingKeys = new ArrayList<String>();
@@ -70,6 +77,16 @@ public class Configuration {
 
     if (missingKeys.size() == 0 && (EnvVars.get("APPLICATION_MODE").toLowerCase().equals("local-listener"))) {
       for (String key : localListenerKeys) {
+        if(envVarMap.containsKey(key) && envVarMap.get(key) != "") {
+          EnvVars.put(key, envVarMap.get(key));
+        } else {
+          missingKeys.add(key);
+        }
+      }
+    }
+
+    if (missingKeys.size() == 0 && (EnvVars.get("APPLICATION_MODE").toLowerCase().equals("local-server"))) {
+      for (String key : localServerKeys) {
         if(envVarMap.containsKey(key) && envVarMap.get(key) != "") {
           EnvVars.put(key, envVarMap.get(key));
         } else {

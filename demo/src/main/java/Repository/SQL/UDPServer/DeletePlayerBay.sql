@@ -1,0 +1,1 @@
+DELETE FROM t_player_bay WHERE m_port = ?;

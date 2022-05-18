@@ -1,3 +1,6 @@
+# SQLite db files
+*.db
+
 # Compiled class file
 *.class
 

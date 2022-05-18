@@ -28,6 +28,22 @@ public class F12021PacketFactory {
     return p;
   }
 
+  public F12021PacketHeader CreatePacketHeader(ByteBuffer bb, String playerName){
+    F12021PacketHeader p = new F12021PacketHeader();
+    p.PlayerName = playerName;
+    p.PacketFormat = reader.Uint16(bb);
+    p.GameMajorVersion = reader.Uint8(bb);
+    p.GameMinorVersion = reader.Uint8(bb);
+    p.PacketVersion = reader.Uint8(bb);
+    p.PacketId = reader.Uint8(bb);
+    p.SessionUID = reader.Uint64(bb);
+    p.SessionTime = reader.Float(bb);
+    p.FrameIdentifier = reader.Uint32(bb);
+    p.PlayerCarIndex = reader.Uint8(bb);
+    p.SecondaryPlayerCarIndex = reader.Uint8(bb);
+    return p;
+  }
+
   public F12021CarMotionData CreateCarMotionData(ByteBuffer bb) {
     F12021CarMotionData p = new F12021CarMotionData();
     p.WorldPositionX = reader.Float(bb);

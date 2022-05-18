@@ -75,7 +75,7 @@ public class F12021UDPPacketHandler {
     }
   }
 
-  public void ProcessMessage(OCIStreamingMessage message) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
+  public synchronized void ProcessMessage(OCIStreamingMessage message) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
     if (!isCached) {
       List<OCIStreamingMessage> messages = new ArrayList<OCIStreamingMessage>();
       messages.add(message);
@@ -115,7 +115,12 @@ public class F12021UDPPacketHandler {
 
     //Send request
     OutputStream os = con.getOutputStream();
-    os.write(body.getBytes("UTF-8"));
+    try {
+      os.write(body.getBytes("UTF-8"));
+    } catch (IOException ex) {
+      var stacktrace = ExceptionUtils.getStackTrace(ex);
+      logger.info(stacktrace);
+    }
     os.close();
     int res = con.getResponseCode();
     if (res != 200) {
@@ -136,7 +141,7 @@ public class F12021UDPPacketHandler {
     }
     String body = "";
     Gson gson = new Gson();
-    String key = "F12020";
+    String key = "F12021";
     String headerJson = gson.toJson(header);
     String payload = "";
     F12021PacketFactory factory = new F12021PacketFactory();
