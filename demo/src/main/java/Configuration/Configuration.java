@@ -25,7 +25,8 @@ public class Configuration {
     "SQL_FOLDER",
     "DB_URL",
     "DB_USER",
-    "DB_PASSWORD" 
+    "DB_PASSWORD",
+    "SCHEMA_NAME"
   };
   private final String[] listenerKeys = {
     "LISTEN_PORT",
@@ -42,7 +43,8 @@ public class Configuration {
     "PLAYER_NAME",
     "API_IP",
     "API_PORT",
-    "SQL_FOLDER"
+    "SQL_FOLDER",
+    "SCHEMA_NAME"
   };
   public boolean ReadEnvVars() {
     Map <String, String> envVarMap = System.getenv();

@@ -22,7 +22,9 @@ public class LapDataRepository2021 {
   public void InsertLapData(long packetHeaderID, F12021LapData lapData, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertLapData2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertLapData2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setInt(1, lapData.Index);  

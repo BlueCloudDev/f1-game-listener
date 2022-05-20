@@ -24,7 +24,9 @@ public class SessionLookupRepository2021 {
     int id = 0;
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertSessionLookup2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertSessionLookup2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
@@ -55,7 +57,9 @@ public class SessionLookupRepository2021 {
     int id = 0;
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(false);
-      var path = Paths.get(SQL_FOLDER, "F12021/SelectSessionLookupIDBySessionUID2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "SelectSessionLookupIDBySessionUID2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, sessionUID);
@@ -75,7 +79,9 @@ public class SessionLookupRepository2021 {
     int id = 0;
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(false);
-      var path = Paths.get(SQL_FOLDER, "F12021/SelectSessionLookupIDBySessionUIDandFrameIdentifier2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "SelectSessionLookupIDBySessionUIDandFrameIdentifier2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, sessionUID);

@@ -61,6 +61,10 @@ public class UDPListener extends Thread{
         packet = new DatagramPacket(buf, buf.length, address, port);
         ReadPacket(packet.getData());
         count = count + 1;
+        if (count % 100 == 0) {
+          var repo = new UDPServerRepository();
+          repo.UpdatePlayerBaysLastPacket(this.port);
+        }
         if (count % 1000 == 0) {
           logger.info("Messages Processed: " + count);
         }
@@ -79,7 +83,7 @@ public class UDPListener extends Thread{
     
     F12021PacketFactory factory = new F12021PacketFactory();
     F12021PacketHeader header = null;
-    if (Configuration.EnvVars.get("APPLICATION_MODE") == "local-server"){
+    if (Configuration.EnvVars.get("APPLICATION_MODE").equals("local-server")){
       UDPServerRepository repo = new UDPServerRepository();
       String name = repo.GetPlayerNameByPort(this.port);
       header = factory.CreatePacketHeader(bb, name);

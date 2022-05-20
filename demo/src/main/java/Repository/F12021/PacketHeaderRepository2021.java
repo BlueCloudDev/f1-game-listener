@@ -24,7 +24,9 @@ public class PacketHeaderRepository2021 {
     long id = 0;
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertPacketHeader2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertPacketHeader2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {

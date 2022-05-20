@@ -1,0 +1,17 @@
+DROP TABLE F12021.t_tyre_stint_history_data_2021;
+DROP TABLE F12021.t_lap_history_data_2021;
+DROP TABLE F12021.t_session_history_data_2021;
+DROP TABLE F12021.t_car_damage_data_2021;
+DROP TABLE F12021.t_final_classification_data_2021;
+DROP TABLE F12021.t_weather_forecast_samples_2021;
+DROP TABLE F12021.t_marshal_zone_2021;
+DROP TABLE F12021.t_session_data_2021;
+DROP TABLE F12021.t_car_motion_data_player_2021;
+DROP TABLE F12021.t_car_motion_data_2021;
+DROP TABLE F12021.t_car_telemetry_data_2021;
+DROP TABLE F12021.t_car_setup_data_2021;
+DROP TABLE F12021.t_car_status_data_2021;
+DROP TABLE F12021.t_participant_data_2021;
+DROP TABLE F12021.t_lap_data_2021;
+DROP TABLE F12021.t_packet_header_2021;
+DROP TABLE F12021.t_session_lookup_2021;

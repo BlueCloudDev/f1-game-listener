@@ -21,7 +21,9 @@ public class CarStatusDataRepository2021 {
   public void InsertCarStatusData(long packetHeaderID, F12021CarStatusData statusData, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertCarStatusData2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertCarStatusData2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, packetHeaderID);

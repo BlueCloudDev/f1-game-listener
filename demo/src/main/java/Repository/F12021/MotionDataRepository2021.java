@@ -23,7 +23,9 @@ public class MotionDataRepository2021 {
     long id = 0;
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertCarMotionData2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertCarMotionData2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
@@ -65,7 +67,9 @@ public class MotionDataRepository2021 {
   public void InsertMotionDataPlayer(long carMotionDataId, F12021PacketMotionData motionData, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertCarMotionDataPlayer2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertCarMotionDataPlayer2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setLong(1, carMotionDataId);

@@ -52,6 +52,7 @@ public class OCIStreaming {
   private static final Logger logger = LogManager.getLogger(OCIStreaming.class);
   private static PoolDataSource pds = null;
   private CloseableHttpClient  httpClient; 
+  private final String APPLICATION_MODE = Configuration.EnvVars.get("APPLICATION_MODE");
   private final String API_HOST = Configuration.EnvVars.get("API_HOST");
   private final String STREAM_OCID = Configuration.EnvVars.get("STREAM_OCID");
   private final String TENANCY_OCID = Configuration.EnvVars.get("TENANCY_OCID");
@@ -70,7 +71,7 @@ public class OCIStreaming {
       OracleDataSourceProvider odsp = new OracleDataSourceProvider();
       pds = odsp.GetOraclePoolDataSource();
     }
-    if (OCIStreaming.offset == 0) {
+    if (APPLICATION_MODE.equals("consumer") && OCIStreaming.offset == 0) {
       cursorID = getCursorID("AT_TIME", offset);
     }
   }

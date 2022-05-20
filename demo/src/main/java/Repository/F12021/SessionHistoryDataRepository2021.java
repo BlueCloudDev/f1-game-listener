@@ -23,7 +23,9 @@ public class SessionHistoryDataRepository2021 {
   public void InsertSessionData(String sessionUID, F12021PacketSessionHistoryData sessionData, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
-      var path = Paths.get(SQL_FOLDER, "F12021/InsertSessionHistoryData2021.sql");
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "InsertParticipantData2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
@@ -43,7 +45,9 @@ public class SessionHistoryDataRepository2021 {
         }
 
         if (id > 0 && sessionData.TyreStintsHistoryData.length > 0) {
-          var path2 = Paths.get(SQL_FOLDER, "F12021/InsertTyreStintHistoryData2021.sql");
+          var path2 = Paths.get(SQL_FOLDER, "F12021");
+          path2 = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+          path2 = Paths.get(path.toString(), "InsertTyreStintHistoryData2021.sql");
           String query2 = new String(Files.readAllBytes(path2.toAbsolutePath()));
           for (int i = 0; i < sessionData.NumTyreStints; i++) {
             try (PreparedStatement tsstmt = con.prepareStatement(query2)) {
@@ -57,7 +61,9 @@ public class SessionHistoryDataRepository2021 {
         }
 
         if (id > 0 && sessionData.LapHistoryData.length > 0) {
-          var path3 = Paths.get(SQL_FOLDER, "F12021/InsertLapHistoryData2021.sql");
+          var path3 = Paths.get(SQL_FOLDER, "F12021");
+          path3 = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+          path3 = Paths.get(path.toString(), "InsertLapHistoryData2021.sql");
           String query3 = new String(Files.readAllBytes(path3.toAbsolutePath()));
           for (int i = 0; i < sessionData.NumLaps; i++) {
             try (PreparedStatement lhstmt = con.prepareStatement(query3)) {

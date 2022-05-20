@@ -34,6 +34,7 @@ public class App {
       .allowedMethods(HttpMethod.POST)
       .allowedMethods(HttpMethod.DELETE)
       .allowedMethods(HttpMethod.GET)
+      .allowedMethods(HttpMethod.OPTIONS)
       .allowedHeaders("content-type")
       .allowNullOrigin()
       .allowCredentials();

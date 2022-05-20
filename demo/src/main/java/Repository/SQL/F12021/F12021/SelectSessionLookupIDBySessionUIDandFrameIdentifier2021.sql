@@ -1,0 +1,1 @@
+SELECT id from F12021.t_session_lookup_2021 WHERE m_session_UID = ? AND m_frame_identifier = ?
