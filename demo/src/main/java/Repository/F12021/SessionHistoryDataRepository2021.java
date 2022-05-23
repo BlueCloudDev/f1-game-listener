@@ -25,7 +25,7 @@ public class SessionHistoryDataRepository2021 {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "F12021");
       path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
-      path = Paths.get(path.toString(), "InsertParticipantData2021.sql");
+      path = Paths.get(path.toString(), "InsertSessionHistoryData2021.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
