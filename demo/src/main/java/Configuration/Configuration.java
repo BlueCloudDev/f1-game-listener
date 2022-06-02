@@ -21,6 +21,14 @@ public class Configuration {
     "USER_OCID",
     "API_HOST",
   };
+  private final String[] apiKeys = {
+    "SQL_FOLDER",
+    "DB_URL",
+    "DB_USER",
+    "DB_PASSWORD",
+    "SCHEMA_NAME",
+    "API_PORT"
+  };
   private final String[] consumerKeys = {
     "SQL_FOLDER",
     "DB_URL",
@@ -69,6 +77,16 @@ public class Configuration {
 
     if (missingKeys.size() == 0 && (EnvVars.get("APPLICATION_MODE").toLowerCase().equals("listener") || EnvVars.get("APPLICATION_MODE").toLowerCase().equals("both"))) {
       for (String key : listenerKeys) {
+        if(envVarMap.containsKey(key) && envVarMap.get(key) != "") {
+          EnvVars.put(key, envVarMap.get(key));
+        } else {
+          missingKeys.add(key);
+        }
+      }
+    }
+
+    if (missingKeys.size() == 0 && (EnvVars.get("APPLICATION_MODE").toLowerCase().equals("api"))) {
+      for (String key : apiKeys) {
         if(envVarMap.containsKey(key) && envVarMap.get(key) != "") {
           EnvVars.put(key, envVarMap.get(key));
         } else {

@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.sql.Timestamp;
 import java.time.Instant;
+import java.util.ArrayList;
 
 import Configuration.Configuration;
 import F12021Packet.F12021SessionLookup;
@@ -73,6 +74,32 @@ public class SessionLookupRepository2021 {
       logger.warn(stackTrace);
     }
     return id;
+  }
+
+  public ArrayList<F12021SessionLookup> SelectPlayerSessions(PoolDataSource dataSource) {
+    ArrayList<F12021SessionLookup> results = new ArrayList<F12021SessionLookup>();
+    try (Connection con = dataSource.getConnection()) {
+      con.setAutoCommit(false);
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "SelectPlayerSessions2021.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
+      try (PreparedStatement stmt = con.prepareStatement(query)) {
+        ResultSet rs = stmt.executeQuery();
+        while(rs.next()){
+          F12021SessionLookup result = new F12021SessionLookup();
+          result.PlayerName = rs.getString(1);
+          result.PlayerCarIndex = rs.getInt(2);
+          result.SessionUID = rs.getString(3);
+          result.CreatedOn = rs.getDate(4);
+          results.add(result);
+        }
+      }
+    } catch (Exception ex ) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
+    }
+    return results;
   }
 
   public int SelectSessionLookupIDBySessionUIDAndFrameIdentifier(String sessionUID, long frameIdentifier, PoolDataSource dataSource) {

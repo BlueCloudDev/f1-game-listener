@@ -46,8 +46,8 @@ public class SessionHistoryDataRepository2021 {
 
         if (id > 0 && sessionData.TyreStintsHistoryData.length > 0) {
           var path2 = Paths.get(SQL_FOLDER, "F12021");
-          path2 = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
-          path2 = Paths.get(path.toString(), "InsertTyreStintHistoryData2021.sql");
+          path2 = Paths.get(path2.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+          path2 = Paths.get(path2.toString(), "InsertTyreStintHistoryData2021.sql");
           String query2 = new String(Files.readAllBytes(path2.toAbsolutePath()));
           for (int i = 0; i < sessionData.NumTyreStints; i++) {
             try (PreparedStatement tsstmt = con.prepareStatement(query2)) {
@@ -62,8 +62,8 @@ public class SessionHistoryDataRepository2021 {
 
         if (id > 0 && sessionData.LapHistoryData.length > 0) {
           var path3 = Paths.get(SQL_FOLDER, "F12021");
-          path3 = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
-          path3 = Paths.get(path.toString(), "InsertLapHistoryData2021.sql");
+          path3 = Paths.get(path3.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+          path3 = Paths.get(path3.toString(), "InsertLapHistoryData2021.sql");
           String query3 = new String(Files.readAllBytes(path3.toAbsolutePath()));
           for (int i = 0; i < sessionData.NumLaps; i++) {
             try (PreparedStatement lhstmt = con.prepareStatement(query3)) {
