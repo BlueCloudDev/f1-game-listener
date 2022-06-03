@@ -29,18 +29,19 @@ public class SessionHistoryDataRepository2021 {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "F12021");
       path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
-      var selectPath = Paths.get(path.toString(), "SelectSessionHistoryDataBySessionUID");
+      var selectPath = Paths.get(path.toString(), "SelectSessionHistoryDataBySessionUIDAndIndex.sql");
       String selectQuery = new String(Files.readAllBytes(selectPath.toAbsolutePath()));
       int historyID = 0;
       try (PreparedStatement selectStmt = con.prepareStatement(selectQuery)) {
         selectStmt.setString(1, sessionUID);
+        selectStmt.setInt(2, sessionData.Index);
         ResultSet rs = selectStmt.executeQuery();
         if (rs.next()) {
           historyID = rs.getInt(1);
         }
       }
       
-      if (historyID != 0) {
+      if (historyID == 0) {
         var insertPath = Paths.get(path.toString(), "InsertSessionHistoryData2021.sql");
         String query = new String(Files.readAllBytes(insertPath.toAbsolutePath()));
         String returnCols[] = { "id" };
@@ -52,7 +53,6 @@ public class SessionHistoryDataRepository2021 {
           stmt.setInt(5, sessionData.BestSector1LapNum);
           stmt.setInt(6, sessionData.BestSector2LapNum);
           stmt.setInt(7, sessionData.BestSector3LapNum);
-          historyID = 0;
           if (stmt.executeUpdate() > 0) {
             ResultSet generatedKeys = stmt.getGeneratedKeys();
             if (null != generatedKeys && generatedKeys.next()) {
@@ -61,7 +61,7 @@ public class SessionHistoryDataRepository2021 {
           }
         }
       } else {
-        var updatePath = Paths.get(path.toString(), "InsertSessionHistoryData2021.sql");
+        var updatePath = Paths.get(path.toString(), "UpdateSessionHistoryData.sql");
         String updateQuery = new String(Files.readAllBytes(updatePath.toAbsolutePath()));
         try (PreparedStatement stmt = con.prepareStatement(updateQuery)) {
           stmt.setInt(1, sessionData.BestLapTimeLapNum);
@@ -91,11 +91,11 @@ public class SessionHistoryDataRepository2021 {
       path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
       var selectPath = Paths.get(path.toString(), "SelectLapHistoryData.sql");
       String selectQuery = new String(Files.readAllBytes(selectPath.toAbsolutePath()));
-      for (int i = 0; i < sessionData.NumTyreStints; i++) {
+      for (int i = 0; i < sessionData.NumLaps; i++) {
         int lapHistoryID = 0;
         try (PreparedStatement selectStmt = con.prepareStatement(selectQuery)) {
           selectStmt.setInt(1, historyID);
-          selectStmt.setInt(2, i);
+          selectStmt.setInt(2, i+1);
           ResultSet rs = selectStmt.executeQuery();
           if (rs.next()) {
             lapHistoryID = rs.getInt(1);
@@ -112,7 +112,7 @@ public class SessionHistoryDataRepository2021 {
             stmt.setLong(4, sessionData.LapHistoryData[i].Sector2TimeInMS);
             stmt.setLong(5, sessionData.LapHistoryData[i].Sector3TimeInMS);
             stmt.setInt(6, sessionData.LapHistoryData[i].LapValidBitFlags);
-            stmt.setInt(7, i);
+            stmt.setInt(7, i+1);
             stmt.execute();
           }
         } else {
@@ -124,6 +124,7 @@ public class SessionHistoryDataRepository2021 {
             stmt.setLong(3, sessionData.LapHistoryData[i].Sector2TimeInMS);
             stmt.setLong(4, sessionData.LapHistoryData[i].Sector3TimeInMS);
             stmt.setInt(5, sessionData.LapHistoryData[i].LapValidBitFlags);
+            stmt.setInt(6, lapHistoryID);
             stmt.executeUpdate();
           }
         }
@@ -173,8 +174,8 @@ public class SessionHistoryDataRepository2021 {
     }
   }
 
-  public F12021PacketSessionHistoryData SelectSessionHistoryData(String SessionUID, PoolDataSource dataSource) {
-    F12021PacketSessionHistoryData result = new F12021PacketSessionHistoryData();
+  public F12021PacketSessionHistoryData SelectSessionHistoryData(String SessionUID, int Index, PoolDataSource dataSource) {
+    F12021PacketSessionHistoryData result = new F12021PacketSessionHistoryData(); 
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(false);
       var path = Paths.get(SQL_FOLDER, "F12021");
@@ -183,6 +184,7 @@ public class SessionHistoryDataRepository2021 {
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, SessionUID);
+        stmt.setInt(2, Index);
         ResultSet rs = stmt.executeQuery();
         while(rs.next()){
           if (result.Id == 0) {

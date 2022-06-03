@@ -57,10 +57,9 @@ import F12021Packet.F12021PacketSessionHistoryData;
 import Configuration.Configuration;
 
 public class F12021UDPPacketHandler {
-  private static final Logger logger = LogManager.getLogger(F12020UDPPacketHandler.class);
+  private static final Logger logger = LogManager.getLogger(F12021UDPPacketHandler.class);
   private static Map<String, Integer> sessionParticipants = new HashMap<String, Integer>();
   private static List<OCIStreamingMessage> messageCache = new ArrayList<OCIStreamingMessage>();
-  private static StopWatch stopwatch = new StopWatch();
   private static OCIStreaming streaming = null;
   private Boolean isCached;
 
@@ -69,9 +68,6 @@ public class F12021UDPPacketHandler {
     isCached = _isCached;
     if (!isCached && streaming == null) {
       streaming = new OCIStreaming();
-    }
-    if (stopwatch.isStopped()) {
-      stopwatch.start();
     }
   }
 
@@ -131,19 +127,16 @@ public class F12021UDPPacketHandler {
     String msg = "Sending cached messages: " + messageCache.size() + " count";
     logger.info(msg);
     messageCache.clear();
-    stopwatch.reset();
   }
 
   public void ReadPacket(F12021PacketHeader header, ByteBuffer bb) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
-    long elapsed = stopwatch.getTime(TimeUnit.MILLISECONDS);
-    if (elapsed > 1000) {
+    if (messageCache.size() > 350) {
       sendCache();
     }
     String body = "";
     Gson gson = new Gson();
     String key = "F12021";
     String headerJson = gson.toJson(header);
-    String payload = "";
     F12021PacketFactory factory = new F12021PacketFactory();
     int numActiveCars = 0;
     OCIStreamingMessage msg = null;

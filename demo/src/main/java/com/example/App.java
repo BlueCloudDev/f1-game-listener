@@ -2,8 +2,11 @@ package com.example;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledFuture;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
@@ -11,9 +14,11 @@ import org.apache.logging.log4j.Logger;
 
 import Configuration.Configuration;
 import OCIStreaming.OCIStreaming;
+import Repository.F12020.OracleDataSourceProvider;
 import Repository.UDPServer.UDPServerRepository;
 import UDPListener.UDPListener;
 import UDPServerModel.PlayerBays;
+import oracle.ucp.jdbc.PoolDataSource;
 
 import com.hellokaton.blade.Blade;
 import com.hellokaton.blade.mvc.http.HttpMethod;
@@ -24,6 +29,7 @@ public class App {
   private static final Logger logger = LogManager.getLogger(App.class);
   private static boolean isConsumerRunning = false;
   public static Map<Integer, Thread> udpListeners = new HashMap<Integer, Thread>();
+  public static PoolDataSource pds = null;
   public static void main(String[] args) {
     Configuration configuration = new Configuration();
     boolean ok = configuration.ReadEnvVars();
@@ -47,13 +53,31 @@ public class App {
 
     if(APPLICATION_MODE.equals("api")) {
       Blade.create().cors(corsOptions).start(App.class, args);
+      if (pds == null) {
+        try {
+          OracleDataSourceProvider odsp = new OracleDataSourceProvider();
+          pds = odsp.GetOraclePoolDataSource();
+        } catch (Exception ex) {
+          String stackTrace = ExceptionUtils.getStackTrace(ex);
+          logger.warn(stackTrace);
+        } 
+      }
     }
 
     if (APPLICATION_MODE.equals("both") || APPLICATION_MODE.equals("consumer")) {
-      Timer timer = new Timer();
+      /*Timer timer = new Timer();
       TimerTask getMsgTask = GetMessagesTask();
-      timer.scheduleAtFixedRate(getMsgTask, 5000, 5000);
-      logger.info("Started consumer task");
+      timer.scheduleAtFixedRate(getMsgTask, 5000, 5000);*/
+      try {
+        ScheduledExecutorService executor = Executors.newScheduledThreadPool(1);
+        ProcessMessagesTask task1 = new ProcessMessagesTask();
+        
+        ScheduledFuture<?> result = executor.scheduleAtFixedRate(task1, 2, 5, TimeUnit.SECONDS);
+        logger.info("Started consumer task");
+      } catch (Exception ex) {
+        String stackTrace = ExceptionUtils.getStackTrace(ex);
+        logger.warn(stackTrace);
+      }
     }
     
     if (APPLICATION_MODE.equals("both") || APPLICATION_MODE.equals("listener") || APPLICATION_MODE.equals("local-listener")) {
@@ -118,5 +142,7 @@ public class App {
       }
     };
   }
+
+ 
 
 }

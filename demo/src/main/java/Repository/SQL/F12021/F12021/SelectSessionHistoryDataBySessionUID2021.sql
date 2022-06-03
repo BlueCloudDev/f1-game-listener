@@ -22,4 +22,4 @@ SELECT
 FROM f12021.t_session_history_data_2021
 JOIN f12021.t_lap_history_data_2021 ON f12021.t_lap_history_data_2021.m_session_history_id = f12021.t_session_history_data_2021.id
 JOIN f12021.t_tyre_stint_history_data_2021 ON f12021.t_tyre_stint_history_data_2021.m_session_history_id = f12021.t_session_history_data_2021.id
-WHERE f12021.t_session_history_data_2021.m_session_uid = ?
+WHERE f12021.t_session_history_data_2021.m_session_uid = ? AND f12021.t_session_history_data_2021.m_index = ?

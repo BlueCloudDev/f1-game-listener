@@ -3,8 +3,11 @@ package com.example;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -16,10 +19,16 @@ import com.hellokaton.blade.annotation.route.DELETE;
 import com.hellokaton.blade.mvc.RouteContext;
 import com.hellokaton.blade.mvc.ui.ResponseType;
 
+import F12021Packet.F12021PacketHeader;
+import MessageHandler.F12020MessageHandler;
+import MessageHandler.F12021MessageHandler;
 import OCIStreaming.OCIStreaming;
 import OCIStreaming.OCIStreamingException;
+import Repository.F12020.OracleDataSourceProvider;
+import Repository.F12021.PacketHeaderRepository2021;
 import Repository.UDPServer.UDPServerRepository;
 import UDPServerModel.PlayerBays;
+import oracle.ucp.jdbc.PoolDataSource;
 
 @Path
 public class WebApiController {
@@ -31,11 +40,61 @@ public class WebApiController {
       streaming = new OCIStreaming();
     }
   }
-  @POST("/f12021") 
+  @POST("/f12021/original") 
   public String post(RouteContext ctx){ 
     String body = ctx.bodyToString();
     try {
       streaming.SendMessage(body);
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.error(stackTrace);
+    }
+    return "Body length: " + body.length(); 
+  }
+
+  private String Base64Decode(String base64Encoded) {
+    byte[] bytes = Base64.getDecoder().decode(base64Encoded);
+    return new String(bytes);
+  }
+
+  private void processEntry(JSONObject msg, PoolDataSource pds) {
+    Gson gson = new Gson();
+
+    String value = Base64Decode(msg.getString("value"));
+    if (!value.startsWith("[")) {
+      logger.warn("Invalid message format received: " + value);
+      return;
+    }
+    JSONArray ja = new JSONArray(value);
+    if (ja.length() == 0 || !ja.get(0).toString().startsWith("{")) {
+      logger.warn("Invalid message format received: " + value);
+      return;
+    }
+    F12021PacketHeader header = gson.fromJson(ja.get(0).toString(), F12021PacketHeader.class);
+    PacketHeaderRepository2021 prepo = new PacketHeaderRepository2021();
+    long id = prepo.InsertPacketHeader(header, pds);
+    if (id == 0) {
+      return;
+    }
+    if (header.PacketFormat == 2020) {
+      F12020MessageHandler msgHandler = new F12020MessageHandler();
+      msgHandler.ProcessMessage(header, id, ja, pds);
+    } else if (header.PacketFormat == 2021) {
+      F12021MessageHandler msgHandler = new F12021MessageHandler();
+      msgHandler.ProcessMessage(header, id, ja, pds);
+    }
+  }
+
+  @POST("/f12021") 
+  public String postDatabase(RouteContext ctx){ 
+    String body = ctx.bodyToString();
+    try {
+      JSONObject obj = new JSONObject(body);
+      var arr = obj.getJSONArray("messages");
+      for(var i = 0; i < arr.length(); i++) {
+        JSONObject msg = arr.getJSONObject(i);
+        processEntry(msg, App.pds);
+      }
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.error(stackTrace);

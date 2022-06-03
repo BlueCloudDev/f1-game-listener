@@ -415,6 +415,7 @@ CREATE TABLE F12021.t_lap_history_data_2021 (
   m_sector_3_time_in_ms NUMBER,
   m_lap_valid_bit_flags NUMBER,
   CONSTRAINT t_lap_history_data_2021_pk PRIMARY KEY (id),
+  CONSTRAINT unique_lap_history_data_2021 UNIQUE (m_session_history_id, m_lap_number),
   CONSTRAINT t_lap_history_2021_fk FOREIGN KEY (m_session_history_id) REFERENCES F12021.t_session_history_data_2021 (id)
 );
 

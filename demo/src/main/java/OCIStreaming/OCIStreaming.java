@@ -107,21 +107,23 @@ public class OCIStreaming {
       }
       JSONArray respBody = new JSONArray(result);
       List<Integer> range = new ArrayList<Integer>();
+      long msgOffset = ((JSONObject)respBody.get(respBody.length()-1)).getLong("offset");
+      if (offset < msgOffset) {
+        offset = msgOffset;
+      }
       for (int i = 0; i < respBody.length(); i++) {
         range.add(i);
       }
       range.parallelStream().forEach(number ->
         processEntry((JSONObject)respBody.get(number), pds)
       );
+      
     }
   }
 
   public void processEntry(JSONObject msg, PoolDataSource pds) {
     Gson gson = new Gson();
-    long msgOffset = msg.getLong("offset");
-    if (offset < msgOffset) {
-      offset = msgOffset;
-    }
+
 
     String value = Base64Decode(msg.getString("value"));
     if (!value.startsWith("[")) {

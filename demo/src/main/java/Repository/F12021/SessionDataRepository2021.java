@@ -29,8 +29,8 @@ public class SessionDataRepository2021 {
       con.setAutoCommit(true);
       var path = Paths.get(SQL_FOLDER, "F12021");
       path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
-      path = Paths.get(path.toString(), "InsertSessionData2021.sql");
-      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
+      var insertSessionPath = Paths.get(path.toString(), "InsertSessionData2021.sql");
+      String query = new String(Files.readAllBytes(insertSessionPath.toAbsolutePath()));
       String returnCols[] = { "id" };
       try (PreparedStatement stmt = con.prepareStatement(query, returnCols)) {
         stmt.setLong(1, packetHeaderID);
@@ -78,8 +78,8 @@ public class SessionDataRepository2021 {
         }
 
         if (id > 0 && sessionData.MarshalZones.length > 0) {
-          var path2 = Paths.get(SQL_FOLDER, "F12021/InsertMarshalZone2021.sql");
-          String query2 = new String(Files.readAllBytes(path2.toAbsolutePath()));
+          var insertMarshalZone = Paths.get(path.toString(), "InsertMarshalZone2021.sql");
+          String query2 = new String(Files.readAllBytes(insertMarshalZone.toAbsolutePath()));
           for (F12021MarshalZone mz : sessionData.MarshalZones) {
             if (mz != null) {
               try (PreparedStatement mzstmt = con.prepareStatement(query2)) {
@@ -93,8 +93,8 @@ public class SessionDataRepository2021 {
         }
 
         if (id > 0 && sessionData.WeatherForecastSamples.length > 0) {
-          var path3 = Paths.get(SQL_FOLDER, "F12021/InsertWeatherForecastSamples2021.sql");
-          String query3 = new String(Files.readAllBytes(path3.toAbsolutePath()));
+          var insertWeatherForecastPath = Paths.get(path.toString(), "InsertWeatherForecastSamples2021.sql");
+          String query3 = new String(Files.readAllBytes(insertWeatherForecastPath.toAbsolutePath()));
           for (F12021WeatherForecastSample wf : sessionData.WeatherForecastSamples) {
             if (wf != null) {
               try (PreparedStatement wfstmt = con.prepareStatement(query3)) {
