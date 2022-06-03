@@ -3,7 +3,10 @@ package F12021Packet;
 
 
 public class F12021PacketSessionData {
+  public int Id;
+  public int PacketId;
   public int SessionLookupID;
+  public String SessionUID;
   public Float SessionTime;
   public Long FrameIdentifier;
   /**
@@ -11,6 +14,7 @@ public class F12021PacketSessionData {
    * 3 = light rain, 4 = heavy rain, 5 = storm                             
    */
   public int Weather;
+  public String WeatherString;
   /**
    * Track temp. in degrees celsius                               
    */
@@ -33,15 +37,18 @@ public class F12021PacketSessionData {
    * 10 = R, 11 = R2, 12 = Time Trial
    */
   public int SessionType;
+  public String SessionTypeString;
   /**
    * -1 for unknown, 0-21 for tracks, see appendix                            
    */
   public int TrackID;
+  public String TrackIDString;
   /**
    * Formula, 0 = F1 Modern, 1 = F1 Classic, 2 = F2,
    * 3 = F1 Generic                   
    */
   public int Formula;
+  public String FormulaString;
   /**
    * Time left in session in seconds                          
    */
@@ -83,10 +90,12 @@ public class F12021PacketSessionData {
    * 2 = virtual safety car                            
    */
   public int SafetyCarStatus;
+  public String SafetyCarStatusString;
   /**
    * 0 = offline, 1 = online                         
    */
   public int NetworkGame;
+  public String NetworkGameString;
   /**
    * Number of weather samples to follow                         
    */

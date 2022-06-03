@@ -1,6 +1,8 @@
 package F12021Packet;
 
 public class F12021LapHistoryData {
+  public int Id;
+  public int LapNumber;
   /**
    * Lap time in MS
    */

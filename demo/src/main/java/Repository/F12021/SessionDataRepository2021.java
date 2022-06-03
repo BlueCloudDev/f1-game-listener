@@ -5,6 +5,8 @@ import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
 
 import Configuration.Configuration;
 import Converter.GameDataConverter2021;
@@ -21,6 +23,7 @@ public class SessionDataRepository2021 {
   private static final Logger logger = LogManager.getLogger(SessionDataRepository2021.class);
   private GameDataConverter2021 gdc = new GameDataConverter2021();
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
+
   public void InsertSessionData(long packetHeaderID, F12021PacketSessionData sessionData, PoolDataSource dataSource) {
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(true);
@@ -70,7 +73,7 @@ public class SessionDataRepository2021 {
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();
           if (null != generatedKeys && generatedKeys.next()) {
-              id = generatedKeys.getLong(1);
+            id = generatedKeys.getLong(1);
           }
         }
 
@@ -114,5 +117,93 @@ public class SessionDataRepository2021 {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.warn(stackTrace);
     }
+  }
+
+  public F12021PacketSessionData SelectSessionData(String SessionUID, PoolDataSource dataSource) {
+    F12021PacketSessionData result = new F12021PacketSessionData();
+    try (Connection con = dataSource.getConnection()) {
+      con.setAutoCommit(false);
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "SelectSessionDataBySessionUID.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
+      try (PreparedStatement stmt = con.prepareStatement(query)) {
+        stmt.setString(1, SessionUID);
+        ResultSet rs = stmt.executeQuery();
+        if (rs.next()) {
+          result = convertResultSetToSessionData(rs);
+        }
+      }
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
+    }
+    return result;
+  }
+
+  public ArrayList<F12021PacketSessionData> SelectAllSessionData(String SessionUID, PoolDataSource dataSource) {
+    ArrayList<F12021PacketSessionData> results = new ArrayList<F12021PacketSessionData>();
+    try (Connection con = dataSource.getConnection()) {
+      con.setAutoCommit(false);
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "SelectSessionDataBySessionUID.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
+      try (PreparedStatement stmt = con.prepareStatement(query)) {
+        stmt.setString(1, SessionUID);
+        ResultSet rs = stmt.executeQuery();
+        while (rs.next()) {
+          var result = convertResultSetToSessionData(rs);
+          results.add(result);
+        }
+      }
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
+    }
+    return results;
+  }
+
+  private F12021PacketSessionData convertResultSetToSessionData(ResultSet rs) throws SQLException {
+    F12021PacketSessionData result = new F12021PacketSessionData();
+    result.Id = rs.getInt(1);
+    result.PacketId = rs.getInt(2);
+    result.SessionLookupID = rs.getInt(3);
+    result.WeatherString = rs.getString(4);
+    result.TrackTemperature = rs.getInt(5);
+    result.AirTemperature = rs.getInt(6);
+    result.TotalLaps = rs.getInt(7);
+    result.TrackLength = rs.getInt(8);
+    result.SessionTypeString = rs.getString(9);
+    result.TrackIDString = rs.getString(10);
+    result.FormulaString = rs.getString(11);
+    result.SessionTimeLeft = rs.getInt(12);
+    result.SessionDuration = rs.getInt(13);
+    result.PitSpeedLimit = rs.getInt(14);
+    result.GamePaused = rs.getInt(15);
+    result.IsSpectating = rs.getInt(16);
+    result.SpectatorCarIndex = rs.getInt(17);
+    result.SliProNativeSupport = rs.getInt(18);
+    result.SafetyCarStatusString = rs.getString(19);
+    result.NetworkGameString = rs.getString(20);
+    result.ForecastAccuracy = rs.getInt(21);
+    result.AIDifficulty = rs.getInt(22);
+    result.SeasonLinkIdentifier = rs.getLong(23);
+    result.WeekendLinkIdentifier = rs.getLong(24);
+    result.SessionLinkIdentifier = rs.getLong(25);
+    result.PitStopWindowIdealLap = rs.getInt(26);
+    result.PitStopWindowLatestLap = rs.getInt(27);
+    result.PitStopRejoinPosition = rs.getInt(28);
+    result.SteeringAssist = rs.getInt(29);
+    result.BrakingAssist = rs.getInt(30);
+    result.GearboxAssist = rs.getInt(31);
+    result.PitAssist = rs.getInt(32);
+    result.PitReleaseAssist = rs.getInt(33);
+    result.ERSAssist = rs.getInt(34);
+    result.DRSAssist = rs.getInt(35);
+    result.DynamicRacingLine = rs.getInt(36);
+    result.DynamicRacingLineType = rs.getInt(37);
+    result.SessionUID = rs.getString(38);
+    return result;
   }
 }

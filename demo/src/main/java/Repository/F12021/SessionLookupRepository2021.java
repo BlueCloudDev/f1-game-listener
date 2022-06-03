@@ -11,7 +11,10 @@ import java.time.Instant;
 import java.util.ArrayList;
 
 import Configuration.Configuration;
+import F12021Packet.F12021LapHistoryData;
+import F12021Packet.F12021PacketSessionHistoryData;
 import F12021Packet.F12021SessionLookup;
+import F12021Packet.F12021TyreStintHistoryData;
 import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -19,7 +22,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 public class SessionLookupRepository2021 {
-  private static final Logger logger = LogManager.getLogger(CarDamageRepository2021.class);
+  private static final Logger logger = LogManager.getLogger(SessionLookupRepository2021.class);
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
   public int InsertSessionLookup(F12021SessionLookup lookup, PoolDataSource dataSource) {
     int id = 0;
@@ -91,7 +94,7 @@ public class SessionLookupRepository2021 {
           result.PlayerName = rs.getString(1);
           result.PlayerCarIndex = rs.getInt(2);
           result.SessionUID = rs.getString(3);
-          result.CreatedOn = rs.getDate(4);
+          result.CreatedOn = rs.getTimestamp(4);
           results.add(result);
         }
       }
@@ -101,6 +104,8 @@ public class SessionLookupRepository2021 {
     }
     return results;
   }
+
+
 
   public int SelectSessionLookupIDBySessionUIDAndFrameIdentifier(String sessionUID, long frameIdentifier, PoolDataSource dataSource) {
     int id = 0;

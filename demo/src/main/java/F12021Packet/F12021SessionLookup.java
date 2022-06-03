@@ -1,6 +1,6 @@
 package F12021Packet;
 
-import java.sql.Date;
+import java.sql.Timestamp;
 
 public class F12021SessionLookup {
   public int Id;
@@ -9,5 +9,5 @@ public class F12021SessionLookup {
   public long FrameIdentifier;
   public float SessionTime;
   public int PlayerCarIndex;
-  public Date CreatedOn;
+  public Timestamp CreatedOn;
 }

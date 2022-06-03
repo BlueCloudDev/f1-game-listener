@@ -142,7 +142,7 @@ public class F12021MessageHandler {
         F12021PacketSessionHistoryData p11 = gson.fromJson(ja.get(1).toString(), F12021PacketSessionHistoryData.class);
         SessionHistoryDataRepository2021 repo10 = new SessionHistoryDataRepository2021();
         p11.SessionLookupID = lookup.Id;
-        repo10.InsertSessionData(header.SessionUID, p11, pds);
+        repo10.UpsertSessionData(header.SessionUID, p11, pds);
     }
   }
 }

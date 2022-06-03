@@ -1,6 +1,8 @@
 package F12021Packet;
 
 public class F12021PacketSessionHistoryData {
+  public int Id;
+  public String SessionUID;
   /**
    * car index
    */
