@@ -8,7 +8,11 @@ import java.nio.charset.StandardCharsets;
 
 import Configuration.Configuration;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 public class F12021PacketFactory {
+  private static final Logger logger = LogManager.getLogger(F12021PacketFactory.class);
   public ByteBufferReader reader = new ByteBufferReader();
   public final String PLAYER_NAME = Configuration.EnvVars.get("PLAYER_NAME");
 

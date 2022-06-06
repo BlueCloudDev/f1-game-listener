@@ -110,23 +110,24 @@ public class F12021UDPPacketHandler {
     con.setDoOutput(true);
 
     //Send request
-    OutputStream os = con.getOutputStream();
     try {
+      OutputStream os = con.getOutputStream();
       os.write(body.getBytes("UTF-8"));
+      
+      os.close();
+      int res = con.getResponseCode();
+      if (res != 200) {
+        logger.info("Error sending message to API: " + res);
+        return;
+      }
+
+      String msg = "Sending cached messages: " + messageCache.size() + " count";
+      logger.info(msg);
+      messageCache.clear();
     } catch (IOException ex) {
       var stacktrace = ExceptionUtils.getStackTrace(ex);
       logger.info(stacktrace);
     }
-    os.close();
-    int res = con.getResponseCode();
-    if (res != 200) {
-      logger.info("Error sending message to API: " + res);
-      return;
-    }
-
-    String msg = "Sending cached messages: " + messageCache.size() + " count";
-    logger.info(msg);
-    messageCache.clear();
   }
 
   public void ReadPacket(F12021PacketHeader header, ByteBuffer bb) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {

@@ -91,7 +91,10 @@ public class SessionHistoryDataRepository2021 {
       path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
       var selectPath = Paths.get(path.toString(), "SelectLapHistoryData.sql");
       String selectQuery = new String(Files.readAllBytes(selectPath.toAbsolutePath()));
-      for (int i = 0; i < sessionData.NumLaps; i++) {
+      for (int i = 0; i < sessionData.LapHistoryData.length; i++) {
+        if (sessionData.LapHistoryData[i].LapTimeInMS == 0) {
+          continue;
+        }
         int lapHistoryID = 0;
         try (PreparedStatement selectStmt = con.prepareStatement(selectQuery)) {
           selectStmt.setInt(1, historyID);
@@ -123,7 +126,16 @@ public class SessionHistoryDataRepository2021 {
             stmt.setLong(2, sessionData.LapHistoryData[i].Sector1TimeInMS);
             stmt.setLong(3, sessionData.LapHistoryData[i].Sector2TimeInMS);
             stmt.setLong(4, sessionData.LapHistoryData[i].Sector3TimeInMS);
+            //NOTE: Sometimes if sector times overrun value of short, game reports bad sector times.
+            //Below checks that they add up and flags the lap if it does not.
+            //However it is not exact, so adding some buffer room
+            int sumSector = sessionData.LapHistoryData[i].Sector1TimeInMS + sessionData.LapHistoryData[i].Sector2TimeInMS + sessionData.LapHistoryData[i].Sector3TimeInMS;
+            if (sumSector < sessionData.LapHistoryData[i].LapTimeInMS + 100 && sumSector > sessionData.LapHistoryData[i].LapTimeInMS - 100)
+            {
             stmt.setInt(5, sessionData.LapHistoryData[i].LapValidBitFlags);
+            } else {
+              stmt.setInt(5, 99);
+            }
             stmt.setInt(6, lapHistoryID);
             stmt.executeUpdate();
           }

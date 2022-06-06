@@ -15,7 +15,7 @@ public class ByteBufferReader {
   }
 
   public int Uint16(ByteBuffer bb){
-    return bb.getShort() & 0xffff;
+    return bb.getShort() & 0xFFFF;
   }
 
   public int Int16(ByteBuffer bb){
