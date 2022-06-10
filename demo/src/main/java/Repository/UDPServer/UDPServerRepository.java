@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -77,6 +78,7 @@ public class UDPServerRepository {
         playerBay.PlayerName = rs.getString("m_player_name");
         playerBay.Port = rs.getInt("m_port");
         playerBay.LastPacketReceived = rs.getDate("m_last_packet_received");
+        playerBay.EventId = rs.getInt("m_event_id");
         playerBays.add(playerBay);
       }
       
@@ -104,24 +106,23 @@ public class UDPServerRepository {
     return playerBays;
   }
 
-  public String GetPlayerNameByPort(int port) throws IOException {
+  public HashMap<String,Integer> GetPlayerNameAndEventIdByPort(int port) throws IOException {
     Connection connection = null;
-    String name = "";
+    HashMap<String,Integer> res = new HashMap<String, Integer>();
     try
     {
       // create a database connection
       var dbpath = Paths.get(SQL_FOLDER, "UDPServer/UDPServer.db");
       connection = DriverManager.getConnection("jdbc:sqlite:" + dbpath);
-      var path = Paths.get(SQL_FOLDER, "UDPServer/SelectPlayerNameByPort.sql");
+      var path = Paths.get(SQL_FOLDER, "UDPServer/SelectPlayerNameAndEventIdByPort.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       PreparedStatement statement = connection.prepareStatement(query);
       statement.setQueryTimeout(30);  // set timeout to 30 sec.
       statement.setInt(1, port);
       var rs = statement.executeQuery();
       while (rs.next()) {
-        name = rs.getString("m_player_name");
+        res.put(rs.getString("m_player_name"), rs.getInt("m_event_id"));
       }
-      
     }
     catch(SQLException e)
     {
@@ -143,10 +144,10 @@ public class UDPServerRepository {
         logger.info(e.getMessage());
       }
     }
-    return name;
+    return res;
   }
 
-  public void InsertPlayerBay(int port) throws IOException {
+  public void InsertPlayerBay(int port, int eventId) throws IOException {
     Connection connection = null;
     try
     {
@@ -157,6 +158,7 @@ public class UDPServerRepository {
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       PreparedStatement statement = connection.prepareStatement(query);
       statement.setInt(1, port);
+      statement.setInt(2, eventId);
       statement.executeUpdate();
     }
     catch(SQLException e)
@@ -249,18 +251,19 @@ public class UDPServerRepository {
     }
   }
 
-  public void UpdatePlayerBaysName(int port, String name) throws IOException {
+  public void UpdatePlayerBaysNameAndEventId(int port, String name, int eventId) throws IOException {
     Connection connection = null;
     try
     {
       // create a database connection
       var dbpath = Paths.get(SQL_FOLDER, "UDPServer/UDPServer.db");
       connection = DriverManager.getConnection("jdbc:sqlite:" + dbpath);
-      var path = Paths.get(SQL_FOLDER, "UDPServer/UpdatePlayerBayName.sql");
+      var path = Paths.get(SQL_FOLDER, "UDPServer/UpdatePlayerBayNameAndEventId.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       PreparedStatement statement = connection.prepareStatement(query);
       statement.setString(1, name);
-      statement.setInt(2, port);
+      statement.setInt(2, eventId);
+      statement.setInt(3, port);
       statement.executeUpdate();
     }
     catch(SQLException e)

@@ -32,9 +32,10 @@ public class F12021PacketFactory {
     return p;
   }
 
-  public F12021PacketHeader CreatePacketHeader(ByteBuffer bb, String playerName){
+  public F12021PacketHeader CreatePacketHeader(ByteBuffer bb, String playerName, int EventId){
     F12021PacketHeader p = new F12021PacketHeader();
     p.PlayerName = playerName;
+    p.EventId = EventId;
     p.PacketFormat = reader.Uint16(bb);
     p.GameMajorVersion = reader.Uint8(bb);
     p.GameMinorVersion = reader.Uint8(bb);

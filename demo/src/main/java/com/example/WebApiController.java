@@ -11,6 +11,7 @@ import java.util.Base64;
 import java.util.List;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.hellokaton.blade.annotation.Path;
 import com.hellokaton.blade.annotation.route.POST;
 import com.hellokaton.blade.annotation.route.PUT;
@@ -19,12 +20,13 @@ import com.hellokaton.blade.annotation.route.DELETE;
 import com.hellokaton.blade.mvc.RouteContext;
 import com.hellokaton.blade.mvc.ui.ResponseType;
 
+import F12021Packet.F12021Event;
 import F12021Packet.F12021PacketHeader;
 import MessageHandler.F12020MessageHandler;
 import MessageHandler.F12021MessageHandler;
 import OCIStreaming.OCIStreaming;
 import OCIStreaming.OCIStreamingException;
-import Repository.F12020.OracleDataSourceProvider;
+import Repository.F12021.EventRepository2021;
 import Repository.F12021.PacketHeaderRepository2021;
 import Repository.UDPServer.UDPServerRepository;
 import UDPServerModel.PlayerBays;
@@ -40,6 +42,7 @@ public class WebApiController {
       streaming = new OCIStreaming();
     }
   }
+
   @POST("/f12021/original") 
   public String post(RouteContext ctx){ 
     String body = ctx.bodyToString();
@@ -121,10 +124,12 @@ public class WebApiController {
     try {
       String portString = ctx.query("port");
       int port = Integer.parseInt(portString);
+      String eventIdString = ctx.query("eventId");
+      int eventId = Integer.parseInt(eventIdString);
       if (port < 5000) {
         return "Port needs to be greater than 5000";
       }
-      repo.InsertPlayerBay(port);
+      repo.InsertPlayerBay(port, eventId);
       return "Success";
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
@@ -139,11 +144,13 @@ public class WebApiController {
     try {
       String portString = ctx.query("port");
       String nameString = ctx.query("name");
+      String eventIdString = ctx.query("eventId");
+      int eventId = Integer.parseInt(eventIdString);
       int port = Integer.parseInt(portString);
       if (port < 5000) {
         return "Port needs to be greater than 5000";
       }
-      repo.UpdatePlayerBaysName(port, nameString);
+      repo.UpdatePlayerBaysNameAndEventId(port, nameString, eventId);
       return "Success";
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
@@ -172,5 +179,39 @@ public class WebApiController {
       logger.error(stackTrace);
       return "Error";
     }
+  }
+
+  @POST("f12021/event")
+  public String insertEvent(RouteContext ctx) {
+    try {
+      String body = ctx.bodyToString();
+      Gson gson = new Gson();
+
+      F12021Event event = gson.fromJson(body, F12021Event.class);
+      if (event.Name == null || event.Name.length() == 0) {
+        return "Invalid name";
+      }
+      var repo = new EventRepository2021();
+      repo.InsertEvent(event, App.pds);
+      return "Success";
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.error(stackTrace);
+      return "Error";
+    }
+  }
+
+  @GET(value = "f12021/event", responseType = ResponseType.JSON)
+  public ArrayList<F12021Event> getEvents() {
+    ArrayList<F12021Event> res = new ArrayList<F12021Event>();
+    try {
+      var repo = new EventRepository2021();
+      res = repo.SelectEvents(App.pds);
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.error(stackTrace);
+      return null;
+    }
+    return res;
   }
 }

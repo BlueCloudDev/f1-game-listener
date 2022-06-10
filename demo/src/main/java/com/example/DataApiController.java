@@ -15,6 +15,8 @@ import com.hellokaton.blade.mvc.ui.ResponseType;
 import F12021Packet.F12021PacketSessionData;
 import F12021Packet.F12021PacketSessionHistoryData;
 import F12021Packet.F12021SessionLookup;
+import F12021Packet.Response.LeaderboardResponse2021;
+import Repository.F12021.LeaderboardRepository2021;
 import Repository.F12021.SessionDataRepository2021;
 import Repository.F12021.SessionHistoryDataRepository2021;
 import Repository.F12021.SessionLookupRepository2021;
@@ -22,6 +24,20 @@ import Repository.F12021.SessionLookupRepository2021;
 @Path("/data")
 public class DataApiController {
   private static final Logger logger = LogManager.getLogger(App.class);
+
+  @GET(value = "/leaderboard", responseType = ResponseType.JSON)
+  public ArrayList<LeaderboardResponse2021> getLeaderboard(@Query int EventId) {
+    LeaderboardRepository2021 repo = new LeaderboardRepository2021();
+    ArrayList<LeaderboardResponse2021> resp = new ArrayList<LeaderboardResponse2021>();
+    try {
+      resp = repo.SelectLeaderboard(EventId, App.pds);
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.error(stackTrace);
+    }
+    return resp;
+  }
+
 
   @GET(value = "/session", responseType = ResponseType.JSON)
   public F12021PacketSessionData getSessionData(@Query String SessionUID) {

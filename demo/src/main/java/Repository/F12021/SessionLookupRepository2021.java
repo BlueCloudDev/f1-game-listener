@@ -40,6 +40,7 @@ public class SessionLookupRepository2021 {
         stmt.setFloat(4, lookup.SessionTime);
         stmt.setTimestamp(5, Timestamp.from(Instant.now()));
         stmt.setInt(6, lookup.PlayerCarIndex);
+        stmt.setInt(7, lookup.EventId);
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();
           if (null != generatedKeys && generatedKeys.next()) {

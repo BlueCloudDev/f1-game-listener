@@ -7,4 +7,5 @@ public class PlayerBays {
   public int Port;
   public String PlayerName;
   public Date LastPacketReceived;
+  public int EventId;
 }

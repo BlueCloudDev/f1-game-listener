@@ -10,6 +10,7 @@ public class F12021PacketHeader {
    * Player name assigned via PLAYER_NAME environment variable on the server
    */
   public String PlayerName;
+  public int EventId;
   /**
    * Game major version - "X.00"
    */

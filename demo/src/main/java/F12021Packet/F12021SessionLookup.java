@@ -10,4 +10,5 @@ public class F12021SessionLookup {
   public float SessionTime;
   public int PlayerCarIndex;
   public Timestamp CreatedOn;
+  public int EventId;
 }
