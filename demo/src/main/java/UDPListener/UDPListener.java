@@ -20,6 +20,7 @@ import F12021Packet.F12021PacketFactory;
 import F12021Packet.F12021PacketHeader;
 import MessageHandler.F12021UDPPacketHandler;
 import Repository.UDPServer.UDPServerRepository;
+import UDPServer.UDPServer;
 import Configuration.Configuration;
 
 import org.apache.logging.log4j.LogManager;
@@ -33,12 +34,19 @@ public class UDPListener extends Thread{
   private static int EventId;
   private DatagramSocket socket = null;
 
-  public UDPListener(Integer _port) {
+  public UDPListener(Integer _port) throws SocketException {
     super();
     if (_port > 0) {
       port = _port;
     } else {
       port = Integer.parseInt(Configuration.EnvVars.get("LISTEN_PORT"));
+    }
+    if (!Configuration.EnvVars.get("UDP_SERVER").equals("")){
+      Runnable server = new UDPServer();
+      Thread thread = new Thread(server);
+
+      System.out.println("Starting UDP Server thread...");
+      thread.start();
     }
   }
 
@@ -80,7 +88,8 @@ public class UDPListener extends Thread{
   
 
   public void ReadPacket(byte[] bytes) throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
-    ByteBuffer bb = ByteBuffer.wrap(bytes);
+    var clone = bytes.clone();
+    ByteBuffer bb = ByteBuffer.wrap(clone);
     bb.order(ByteOrder.LITTLE_ENDIAN);
     
     F12021PacketFactory factory = new F12021PacketFactory();

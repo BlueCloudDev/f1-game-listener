@@ -52,7 +52,11 @@ public class Configuration {
     "API_IP",
     "API_PORT",
     "SQL_FOLDER",
-    "SCHEMA_NAME"
+    "SCHEMA_NAME",
+    "UDP_SERVER",
+    "DB_URL",
+    "DB_USER",
+    "DB_PASSWORD"
   };
   public boolean ReadEnvVars() {
     Map <String, String> envVarMap = System.getenv();

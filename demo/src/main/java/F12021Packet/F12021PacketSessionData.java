@@ -84,7 +84,7 @@ public class F12021PacketSessionData {
   /**
    * List of marshal zones - max 21                         
    */
-  public F12021MarshalZone[] MarshalZones = new F12021MarshalZone[21];
+  public F12021MarshalZone[] MarshalZones = new F12021MarshalZone[500];
   /**
    * 0 = no safety car, 1 = full safety car
    * 2 = virtual safety car                            

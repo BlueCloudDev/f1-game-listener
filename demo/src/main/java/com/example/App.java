@@ -104,11 +104,13 @@ public class App {
       try {
         udprepo.InitDB();
         Blade.create().cors(corsOptions).start(App.class, args);
+        OracleDataSourceProvider odsp = new OracleDataSourceProvider();
+        pds = odsp.GetOraclePoolDataSource();
         while (true) {
           var res = udprepo.GetPlayerBays();
           for (PlayerBays bay : res) {
-            UDPListener udpListener = new UDPListener(bay.Port);
             if (!App.udpListeners.containsKey(bay.Port)) {
+              UDPListener udpListener = new UDPListener(bay.Port);
               udpListener.start();
               App.udpListeners.put(bay.Port, udpListener);
             }

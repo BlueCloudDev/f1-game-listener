@@ -6,6 +6,7 @@ import org.apache.logging.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
@@ -13,6 +14,7 @@ import java.util.List;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.hellokaton.blade.annotation.Path;
+import com.hellokaton.blade.annotation.request.Query;
 import com.hellokaton.blade.annotation.route.POST;
 import com.hellokaton.blade.annotation.route.PUT;
 import com.hellokaton.blade.annotation.route.GET;
@@ -22,13 +24,16 @@ import com.hellokaton.blade.mvc.ui.ResponseType;
 
 import F12021Packet.F12021Event;
 import F12021Packet.F12021PacketHeader;
+import F12021Packet.F12021TrackCorner;
 import MessageHandler.F12020MessageHandler;
 import MessageHandler.F12021MessageHandler;
 import OCIStreaming.OCIStreaming;
 import OCIStreaming.OCIStreamingException;
 import Repository.F12021.EventRepository2021;
 import Repository.F12021.PacketHeaderRepository2021;
+import Repository.F12021.TrackCornerRepository;
 import Repository.UDPServer.UDPServerRepository;
+import UDPServer.UDPServer;
 import UDPServerModel.PlayerBays;
 import oracle.ucp.jdbc.PoolDataSource;
 
@@ -62,7 +67,6 @@ public class WebApiController {
 
   private void processEntry(JSONObject msg, PoolDataSource pds) {
     Gson gson = new Gson();
-
     String value = Base64Decode(msg.getString("value"));
     if (!value.startsWith("[")) {
       logger.warn("Invalid message format received: " + value);
@@ -181,6 +185,13 @@ public class WebApiController {
     }
   }
 
+  @GET("/udpserver/client")
+  public String addClient(RouteContext ctx) {
+    var clientIp = ctx.address();
+    UDPServer.clients.put(clientIp, LocalTime.now());
+    return "Added";
+  }
+
   @POST("f12021/event")
   public String insertEvent(RouteContext ctx) {
     try {
@@ -207,6 +218,20 @@ public class WebApiController {
     try {
       var repo = new EventRepository2021();
       res = repo.SelectEvents(App.pds);
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.error(stackTrace);
+      return null;
+    }
+    return res;
+  }
+
+  @GET(value = "f12021/corner", responseType = ResponseType.JSON)
+  public ArrayList<F12021TrackCorner> getCorners(@Query String trackId) {
+    ArrayList<F12021TrackCorner> res = new ArrayList<F12021TrackCorner>();
+    try {
+      var repo = new TrackCornerRepository();
+      res = repo.SelectCorners(trackId, App.pds);
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.error(stackTrace);

@@ -541,7 +541,7 @@ public class GameDataConverter2021 {
       case 11: return "Kevin Magnussen";
       case 12: return "Romain Grosjean";
       case 13: return "Sebastian Vettel";
-      case 14: return "Sergio Vettel";
+      case 14: return "Sergio Perez";
       case 15: return "Valtteri Bottas";
       case 17: return "Esteban Ocon";
       case 19: return "Lance Stroll";
@@ -641,7 +641,7 @@ public class GameDataConverter2021 {
       case 120: return "Matteo Nannini";
       case 121: return "Alessio Deledda";
       case 122: return "Bent Viscaal";
-      case 123: return "enzo Fittipaldi";
+      case 123: return "Enzo Fittipaldi";
       default: return "Default";
     }
   }

@@ -12,39 +12,38 @@ import java.util.ArrayList;
 
 import Configuration.Configuration;
 import F12021Packet.F12021TrackCoordinates;
+import F12021Packet.F12021TrackCorner;
 import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-public class TrackCoordinatesRepository {
-  private static final Logger logger = LogManager.getLogger(TrackCoordinatesRepository.class);
+public class TrackCornerRepository {
+  private static final Logger logger = LogManager.getLogger(TrackCornerRepository.class);
   private String SQL_FOLDER = Configuration.EnvVars.get("SQL_FOLDER");
 
-  public ArrayList<F12021TrackCoordinates> SelectTrackCoordinates(String TrackIdString, PoolDataSource dataSource) {
-    ArrayList<F12021TrackCoordinates> results = new ArrayList<F12021TrackCoordinates>();
+  public ArrayList<F12021TrackCorner> SelectCorners(String TrackIdString, PoolDataSource dataSource) {
+    ArrayList<F12021TrackCorner> results = new ArrayList<F12021TrackCorner>();
     try (Connection con = dataSource.getConnection()) {
       con.setAutoCommit(false);
       var path = Paths.get(SQL_FOLDER, "F12021");
       path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
-      path = Paths.get(path.toString(), "SelectTrackCoordinatesByTrackId.sql");
+      path = Paths.get(path.toString(), "SelectTrackCornerByTrackId.sql");
       String query = new String(Files.readAllBytes(path.toAbsolutePath()));
       try (PreparedStatement stmt = con.prepareStatement(query)) {
         stmt.setString(1, TrackIdString);
         ResultSet rs = stmt.executeQuery();
         while(rs.next()){
-          F12021TrackCoordinates result = new F12021TrackCoordinates();
+          F12021TrackCorner result = new F12021TrackCorner();
           result.Id = rs.getInt(1);
           result.TrackIdString = rs.getString(2);
-          result.TrackType = rs.getString(3);
-          result.TrackVolumeId = rs.getInt(4);
-          result.Point2X = rs.getInt(5);
-          result.Point2Y = rs.getInt(6);
-          result.Point2Z = rs.getInt(7);
-          result.Point3X = rs.getInt(8);
-          result.Point3Y = rs.getInt(9);
-          result.Point3Z = rs.getInt(10);
+          result.Corner = rs.getInt(3);
+          result.Apex1 = rs.getDouble(4);
+          result.Apex2 = rs.getDouble(5);
+          result.Apex3 = rs.getDouble(6);
+          result.X = rs.getDouble(7);
+          result.Y = rs.getDouble(8);
 
           results.add(result);
         }
