@@ -21,7 +21,7 @@ public class OracleDataSourceProvider {
     pds.setUser(DB_USER);
     pds.setPassword(DB_PASSWORD);
     pds.setConnectionPoolName("JDBC_UCP_POOL");
-    pds.setMaxPoolSize(15);
+    pds.setMaxPoolSize(100);
     //pds.setInitialPoolSize(10);
 
     //Properties info = new Properties();              

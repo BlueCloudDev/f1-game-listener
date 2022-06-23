@@ -50,7 +50,8 @@ public class F12021PacketLapDataRunner implements Runnable {
       lap.LapData = trunc1;
       var body = gson.toJson(lap);
       var msg = new OCIStreamingMessage(key, headerJson, body);
-      F12021UDPPacketHandler.AddMessage(msg);
+      F12021UDPPacketHandler h = new F12021UDPPacketHandler(true);
+      h.AddMessage(msg);
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.warn(stackTrace);

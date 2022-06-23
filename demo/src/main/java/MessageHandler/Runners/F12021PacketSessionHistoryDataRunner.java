@@ -33,7 +33,8 @@ public class F12021PacketSessionHistoryDataRunner implements Runnable {
       F12021PacketSessionHistoryData sessionHistoryData = factory.CreatePacketSessionHistoryData(bb);
       var body = gson.toJson(sessionHistoryData);
       var msg = new OCIStreamingMessage(key, headerJson, body);
-      F12021UDPPacketHandler.AddMessage(msg);
+      F12021UDPPacketHandler h = new F12021UDPPacketHandler(true);
+      h.AddMessage(msg);
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.warn(stackTrace);

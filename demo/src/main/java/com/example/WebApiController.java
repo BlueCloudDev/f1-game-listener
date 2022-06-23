@@ -10,6 +10,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Base64;
 import java.util.List;
+import java.util.concurrent.ForkJoinPool;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -98,10 +99,18 @@ public class WebApiController {
     try {
       JSONObject obj = new JSONObject(body);
       var arr = obj.getJSONArray("messages");
+      var pArr = new ArrayList<JSONObject>();
       for(var i = 0; i < arr.length(); i++) {
         JSONObject msg = arr.getJSONObject(i);
-        processEntry(msg, App.pds);
+        pArr.add(msg);
       }
+      ForkJoinPool myPool = new ForkJoinPool(100);
+      myPool.submit(() ->
+          pArr.parallelStream().forEach(item -> {
+            processEntry(item, App.pds);
+          })
+      ).get();
+      
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.error(stackTrace);
@@ -226,17 +235,4 @@ public class WebApiController {
     return res;
   }
 
-  @GET(value = "f12021/corner", responseType = ResponseType.JSON)
-  public ArrayList<F12021TrackCorner> getCorners(@Query String trackId) {
-    ArrayList<F12021TrackCorner> res = new ArrayList<F12021TrackCorner>();
-    try {
-      var repo = new TrackCornerRepository();
-      res = repo.SelectCorners(trackId, App.pds);
-    } catch (Exception ex) {
-      String stackTrace = ExceptionUtils.getStackTrace(ex);
-      logger.error(stackTrace);
-      return null;
-    }
-    return res;
-  }
 }

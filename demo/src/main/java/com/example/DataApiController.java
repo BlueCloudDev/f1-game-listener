@@ -15,7 +15,9 @@ import com.hellokaton.blade.mvc.ui.ResponseType;
 import F12021Packet.F12021PacketSessionData;
 import F12021Packet.F12021PacketSessionHistoryData;
 import F12021Packet.F12021SessionLookup;
+import F12021Packet.Response.CarTelemetryByLap;
 import F12021Packet.Response.LeaderboardResponse2021;
+import Repository.F12021.CarTelemetryRepository2021;
 import Repository.F12021.LeaderboardRepository2021;
 import Repository.F12021.SessionDataRepository2021;
 import Repository.F12021.SessionHistoryDataRepository2021;
@@ -62,6 +64,19 @@ public class DataApiController {
       String stackTrace = ExceptionUtils.getStackTrace(ex);
       logger.error(stackTrace);
       return new ArrayList<F12021SessionLookup>();
+    }
+  }
+
+  @GET(value = "/session/lap", responseType = ResponseType.JSON)
+  public List<CarTelemetryByLap> getSessionLap(@Query String SessionUID) {
+    CarTelemetryRepository2021 repo = new CarTelemetryRepository2021();
+    try {
+      List<CarTelemetryByLap> res = repo.SelectCarTelemetryBySessionUID(SessionUID, App.pds);
+      return res;
+    } catch (Exception ex) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.error(stackTrace);
+      return new ArrayList<CarTelemetryByLap>();
     }
   }
 

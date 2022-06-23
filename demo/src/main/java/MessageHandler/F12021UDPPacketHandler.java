@@ -13,6 +13,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.locks.ReentrantLock;
 
 import com.google.gson.Gson;
 
@@ -44,9 +48,10 @@ import Configuration.Configuration;
 public class F12021UDPPacketHandler {
   private static final Logger logger = LogManager.getLogger(F12021UDPPacketHandler.class);
   private static Map<String, Integer> sessionParticipants = new HashMap<String, Integer>();
-  private static List<OCIStreamingMessage> messageCache = new ArrayList<OCIStreamingMessage>();
+  private static LinkedBlockingQueue<OCIStreamingMessage> activeCache = null;
   private static OCIStreaming streaming = null;
-  private static Timer timer = new Timer();
+  private static Timer timer = null;
+  private static ReentrantLock lock = new ReentrantLock();
   private Boolean isCached;
 
   public F12021UDPPacketHandler(Boolean _isCached) throws OCIStreamingException, Exception {
@@ -55,27 +60,15 @@ public class F12021UDPPacketHandler {
     if (!isCached && streaming == null) {
       streaming = new OCIStreaming();
     }
-    TimerTask sendCacheTask = SendCacheTask();
-    timer.scheduleAtFixedRate(sendCacheTask, 1000, 500);
+    if (activeCache == null) {
+      activeCache = new LinkedBlockingQueue<OCIStreamingMessage>();
+    }
+    
   }
 
-  public TimerTask SendCacheTask() {
-    return new TimerTask() {
-      @Override
-      public void run() {
-        try {
-          if (GetMessageCache().size() > 350) {
-            sendCache();
-          }
-        } catch (Exception ex) {
-          String stackTrace = ExceptionUtils.getStackTrace(ex);
-          logger.fatal(stackTrace);
-        }
-      }
-    };
-  }
 
-  public synchronized void ProcessMessage(OCIStreamingMessage message)
+
+  public void ProcessMessage(OCIStreamingMessage message)
       throws IOException, ClientProtocolException, UnsupportedEncodingException, Exception {
     if (!isCached) {
       List<OCIStreamingMessage> messages = new ArrayList<OCIStreamingMessage>();
@@ -86,19 +79,39 @@ public class F12021UDPPacketHandler {
       body = body + "\n";
       streaming.SendMessage(body);
     } else {
-      messageCache.add(message);
+      AddMessage(message);
     }
   }
 
-  public static synchronized void AddMessage(OCIStreamingMessage message) {
-    messageCache.add(message);
+  public void AddMessage(OCIStreamingMessage message) throws MalformedURLException, IOException, InterruptedException {
+    synchronized(activeCache) {
+      if (activeCache.size() >= 250) {
+        if (!lock.isLocked()) {
+          lock.lock();
+          sendCache();
+        }
+        while(!activeCache.isEmpty()) {
+          activeCache.wait();
+        }
+      }
+      activeCache.add(message);
+    }
+    /*if (cache.size() > 500) {
+      fullCacheLists.add(cache);
+      cache.clear();
+    }*/
   }
 
-  public synchronized List<OCIStreamingMessage> GetMessageCache() {
-    return messageCache;
+  private ArrayList<OCIStreamingMessage> GetMessageCache() throws InterruptedException {
+    synchronized(activeCache) {
+      ArrayList<OCIStreamingMessage> res = new ArrayList<OCIStreamingMessage>();
+      activeCache.drainTo(res);
+      activeCache.notifyAll();
+      return res;
+    }
   }
 
-  public void sendCache() throws MalformedURLException, IOException {
+  public void sendCache() throws MalformedURLException, IOException, InterruptedException {
     JSONObject jo = new JSONObject();
     var msgs = new Gson().toJson(GetMessageCache());
     JSONArray ja = new JSONArray(msgs);
@@ -137,12 +150,13 @@ public class F12021UDPPacketHandler {
         return;
       }
 
-      String msg = "Sending cached messages: " + messageCache.size() + " count";
+      String msg = "Sending cached messages: " + msgs.length() + " count";
       logger.info(msg);
-      messageCache.clear();
     } catch (IOException ex) {
       var stacktrace = ExceptionUtils.getStackTrace(ex);
       logger.info(stacktrace);
+    } finally {
+      lock.unlock();
     }
   }
 

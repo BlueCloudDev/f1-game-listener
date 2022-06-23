@@ -11,6 +11,8 @@ import Configuration.Configuration;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import com.google.gson.Gson;
+
 public class F12021PacketFactory {
   private static final Logger logger = LogManager.getLogger(F12021PacketFactory.class);
   public ByteBufferReader reader = new ByteBufferReader();
@@ -530,6 +532,9 @@ public class F12021PacketFactory {
     for(int i = 0; i < p.TyreStintsHistoryData.length; i++) {
       p.TyreStintsHistoryData[i] = CreateTyreStintHistoryData(bb);
     }
+    //var g = new Gson();
+    //var res = g.toJson(p);
+    //System.out.println(res);
     return p;
   }
 

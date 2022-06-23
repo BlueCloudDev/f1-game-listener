@@ -4,9 +4,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.util.ArrayList;
+import java.util.List;
 
 import Configuration.Configuration;
 import F12021Packet.F12021CarTelemetryData;
+import F12021Packet.Response.CarTelemetryByLap;
 import oracle.ucp.jdbc.PoolDataSource;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -66,5 +70,35 @@ public class CarTelemetryRepository2021 {
     }
   }
 
-  
+  public List<CarTelemetryByLap> SelectCarTelemetryBySessionUID(String SessionUID, PoolDataSource dataSource) {
+    List<CarTelemetryByLap> results = new ArrayList<CarTelemetryByLap>(); 
+    try (Connection con = dataSource.getConnection()) {
+      con.setAutoCommit(false);
+      var path = Paths.get(SQL_FOLDER, "F12021");
+      path = Paths.get(path.toString(), Configuration.EnvVars.get("SCHEMA_NAME"));
+      path = Paths.get(path.toString(), "SelectCarTelemetryDataBySessionUID.sql");
+      String query = new String(Files.readAllBytes(path.toAbsolutePath()));
+      try (PreparedStatement stmt = con.prepareStatement(query)) {
+        stmt.setString(1, SessionUID);
+        ResultSet rs = stmt.executeQuery();
+        while(rs.next()){
+          var res = new CarTelemetryByLap();
+          res.FrameIdentifier = rs.getLong(1);
+          res.CurrentLapNumber = rs.getInt(2);
+          res.LapDistance = rs.getInt(3);
+          res.Speed = rs.getInt(4);
+          res.Throttle = rs.getFloat(5);
+          res.Steer = rs.getFloat(6);
+          res.Brake = rs.getFloat(7);
+          res.DRS = rs.getInt(8);
+          res.EngineRPM = rs.getInt(9);
+          results.add(res);
+        }
+      }
+    } catch (Exception ex ) {
+      String stackTrace = ExceptionUtils.getStackTrace(ex);
+      logger.warn(stackTrace);
+    }
+    return results;
+  }
 }

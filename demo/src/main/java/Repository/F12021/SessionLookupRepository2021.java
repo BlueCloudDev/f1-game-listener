@@ -40,6 +40,9 @@ public class SessionLookupRepository2021 {
         stmt.setFloat(4, lookup.SessionTime);
         stmt.setTimestamp(5, Timestamp.from(Instant.now()));
         stmt.setInt(6, lookup.PlayerCarIndex);
+        if (lookup.EventId == 0) {
+          lookup.EventId = 1;
+        }
         stmt.setInt(7, lookup.EventId);
         if (stmt.executeUpdate() > 0) {
           ResultSet generatedKeys = stmt.getGeneratedKeys();
@@ -49,7 +52,7 @@ public class SessionLookupRepository2021 {
         }
       }
     } catch (SQLIntegrityConstraintViolationException ex) {
-      id = SelectSessionLookupIDBySessionUID(lookup.SessionUID, dataSource);
+      id = SelectSessionLookupIDBySessionUIDAndFrameIdentifier(lookup.SessionUID, lookup.FrameIdentifier, dataSource);
       return id;
     } catch (Exception ex) {
       String stackTrace = ExceptionUtils.getStackTrace(ex);

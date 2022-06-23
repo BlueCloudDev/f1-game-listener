@@ -2,6 +2,7 @@ package com.example;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -13,6 +14,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import Configuration.Configuration;
+import MessageHandler.F12021UDPPacketHandler;
 import OCIStreaming.OCIStreaming;
 import Repository.F12020.OracleDataSourceProvider;
 import Repository.UDPServer.UDPServerRepository;
@@ -30,6 +32,7 @@ public class App {
   private static boolean isConsumerRunning = false;
   public static Map<Integer, Thread> udpListeners = new HashMap<Integer, Thread>();
   public static PoolDataSource pds = null;
+  private static Timer timer = null;
   public static void main(String[] args) {
     Configuration configuration = new Configuration();
     boolean ok = configuration.ReadEnvVars();
@@ -145,6 +148,19 @@ public class App {
     };
   }
 
- 
+  public static TimerTask SendCacheTask() {
+    return new TimerTask() {
+      @Override
+      public void run() {
+          try {
+            
+
+          } catch (Exception ex) {
+            String stackTrace = ExceptionUtils.getStackTrace(ex);
+            logger.fatal(stackTrace);
+          }
+        }
+    };
+  }
 
 }
